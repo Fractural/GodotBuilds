@@ -1,5 +1,12 @@
 name: 🛠️ Godot Engine Builds
 on:
+  workflow_dispatch:
+    inputs:
+      make-release:
+        description: 'Make release'
+        required: false
+        type: boolean
+        default: true
   push:
     branches:
       - main
@@ -933,7 +940,10 @@ jobs:
           name: ${{ matrix.cache-name }}
   
   create-release:
-    if: success()
+    if: success() && (
+        (github.event_name == 'push') ||
+        (github.event_name == 'workflow_dispatch' && inputs.make-release)
+      )
     needs: [ios, android, javascript, linux, macos, server, windows]
     name: Create Release
     runs-on: ubuntu-20.04
@@ -957,7 +967,10 @@ jobs:
           prerelease: false
   
   upload-release-artifacts:
-    if: success()
+    if: success() && (
+        (github.event_name == 'push') ||
+        (github.event_name == 'workflow_dispatch' && inputs.make-release)
+      )
     needs: create-release
     name: Upload Release Artifacts
     runs-on: ubuntu-20.04
