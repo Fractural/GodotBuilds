@@ -1,0 +1,1003 @@
+name: 🛠️ Godot Engine Builds
+on:
+  push:
+    branches:
+      - main
+
+# Global Settings
+# SCONS_CACHE for windows must be set in the build environment
+env:
+  # Only used for the cache key. Increment version to force clean build.
+  GODOT_BASE_BRANCH: 3.x
+  GODOT_MONO_BUILD_TAG: release-fcf205c
+
+jobs:
+  ios:
+    runs-on: "macos-latest"
+    name: 🍏 iOS ${{ matrix.name }}
+    env:
+      SCONSFLAGS: verbose=yes warnings=all
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Template (target=release, tools=no)
+            cache-name: ios-template
+            sconsflags: debug_symbols=no
+            tools: false
+            build-mono: false
+            artifact: true
+
+          - name: Template w/ Mono (target=release, tools=no)
+            cache-name: ios-template-mono
+            sconsflags: mono_static=yes debug_symbols=no
+            tools: false
+            build-mono: true
+            artifact: true
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download Godot
+        uses: ./.github/actions/godot-download
+
+      - name: Setup Godot build cache
+        uses: ./.github/actions/godot-cache
+        continue-on-error: true
+
+      - name: Setup python and scons
+        uses: ./.github/actions/godot-deps
+
+      # --------------------------------------------- MONO START --------------------------------------------- #
+      - name: Setup mono (arm64)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-bcl: "bcl-ios"
+          mono-release: "ios-arm64"
+
+      - name: Setup mono (x86_64)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-release: "ios-x86_64"
+      
+      - name: Mono precompilation
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no
+          platform: osx
+          tools: true
+
+      # Generate mono glue
+      - name: Generate Mono glue code
+        if: ${{ matrix.build-mono }}
+        run: |
+          DRI_PRIME=0 "./bin/godot.osx.tools.64.mono" --generate-mono-glue modules/mono/glue
+
+      - name: Set Mono scons flags
+        if: ${{ matrix.build-mono }}
+        run: |
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/monotouch" >> $GITHUB_ENV
+      # --------------------------------------------- MONO END ----------------------------------------------- #
+
+      # - name: Compilation (arch=arm)
+      #   uses: ./.github/actions/godot-build
+      #   with:
+      #     # Using arm64 mono for now -- not sure if this is allowed
+      #     sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=arm ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/ios-arm64-release' || '' }}
+      #     platform: iphone
+      #     target: release
+      #     tools: false
+      
+      - name: Compilation (arch=arm64)
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=arm64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/ios-arm64-release' || '' }}
+          platform: iphone
+          target: release
+          tools: false
+      
+      - name: Compilation (arch=x86_64 ios_simulator=yes)
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ios_simulator=yes ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/ios-x86_64-release' || '' }}
+          platform: iphone
+          target: release
+          tools: false
+      
+      - name: Bundle builds
+        shell: bash
+        run: |
+          echo $(basename bin/*)
+
+          lipo -create bin/libgodot.iphone.opt.arm64.a bin/libgodot.iphone.opt.x86_64.simulator.a -output bin/libgodot.iphone.release.fat.a
+
+          mkdir -p bin/ios
+          mkdir -p bin/ios/iphone-mono-libs
+
+          if [[ ${{ matrix.build-mono }} == true ]]; then
+           
+            # Mono bundling
+
+            lipo -create bin/libmonosgen-2.0.iphone.arm64.a bin/libmonosgen-2.0.iphone.x86_64.simulator.a -output bin/ios/iphone-mono-libs/libmonosgen-2.0.iphone.fat.a
+            lipo -create bin/libmono-native.iphone.arm64.a bin/libmono-native.iphone.x86_64.simulator.a -output bin/ios/iphone-mono-libs/libmono-native.iphone.fat.a
+            lipo -create bin/libmono-profiler-log.iphone.arm64.a bin/libmono-profiler-log.iphone.x86_64.simulator.a -output bin/ios/iphone-mono-libs/libmono-profiler-log.iphone.fat.a
+
+            lipo -create bin/libmono-ee-interp.iphone.arm64.a -output bin/ios/iphone-mono-libs/libmono-ee-interp.iphone.fat.a
+            lipo -create bin/libmono-icall-table.iphone.arm64.a -output bin/ios/iphone-mono-libs/libmono-icall-table.iphone.fat.a
+            lipo -create bin/libmono-ilgen.iphone.arm64.a -output bin/ios/iphone-mono-libs/libmono-ilgen.iphone.fat.a
+          fi
+
+      - name: Upload artifact
+        uses: ./.github/actions/upload-artifact
+        with:
+          name: ${{ matrix.cache-name }}
+  
+  android:
+    runs-on: "ubuntu-20.04"
+    name: 🤖 Android ${{ matrix.name }}
+    env:
+      SCONSFLAGS: verbose=yes warnings=all
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Template (target=release, tools=no)
+            cache-name: android-template
+            sconsflags: debug_symbols=no
+            tools: false
+            build-mono: false
+            artifact: true
+
+          - name: Template w/ Mono (target=release, tools=no)
+            cache-name: android-template-mono
+            sconsflags: debug_symbols=no
+            tools: false
+            build-mono: true
+            artifact: true
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download Godot
+        uses: ./.github/actions/godot-download
+
+      - name: Linux dependencies
+        shell: bash
+        run: |
+          # Azure repositories are not reliable, we need to prevent azure giving us packages.
+          sudo rm -f /etc/apt/sources.list.d/*
+          sudo cp -f misc/ci/sources.list /etc/apt/sources.list
+          sudo apt-get update
+          # The actual dependencies
+          sudo apt-get install build-essential pkg-config libx11-dev libxcursor-dev \
+              libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev \
+              libdbus-1-dev libudev-dev libxi-dev libxrandr-dev yasm xvfb unzip \
+              libspeechd-dev speech-dispatcher
+
+      # Azure repositories are not reliable, we need to prevent azure giving us packages.
+      - name: Make apt sources.list use the default Ubuntu repositories
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/*
+          sudo cp -f misc/ci/sources.list /etc/apt/sources.list
+          sudo apt-get update
+
+      - name: Set up Java 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - name: Setup Godot build cache
+        uses: ./.github/actions/godot-cache
+        continue-on-error: true
+
+      - name: Setup python and scons
+        uses: ./.github/actions/godot-deps
+
+      # --------------------------------------------- MONO START --------------------------------------------- #
+      - name: Setup mono (arm64)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-bcl: "bcl-android"
+          mono-release: "android-arm64-v8a"
+      
+      - name: Setup mono (armv7)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-release: "android-armeabi-v7a"
+      
+      - name: Setup mono (x86)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-release: "android-x86"
+
+      - name: Setup mono (x86_64)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-release: "android-x86_64"
+      
+      - name: Mono precompilation
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no
+          platform: linuxbsd
+          tools: true
+
+      # Generate mono glue
+      - name: Generate Mono glue code
+        if: ${{ matrix.build-mono }}
+        run: |
+          DRI_PRIME=0 xvfb-run "./bin/godot.x11.tools.64.mono" --generate-mono-glue modules/mono/glue || true
+
+      - name: Set Mono scons flags
+        if: ${{ matrix.build-mono }}
+        run: |
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/monodroid" >> $GITHUB_ENV
+      # --------------------------------------------- MONO END ----------------------------------------------- #
+
+      - name: Compilation (android_arch=arm64v8)
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} android_arch=arm64v8 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/android-arm64-v8a-release' || '' }}
+          platform: android
+          target: release
+          tools: false
+      
+      - name: Compilation (android_arch=armv7)
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} android_arch=armv7 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/android-armeabi-v7a-release' || '' }}
+          platform: android
+          target: release
+          tools: false
+      
+      - name: Compilation (android_arch=x86)
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} android_arch=x86 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/android-x86-release' || '' }}
+          platform: android
+          target: release
+          tools: false
+
+      - name: Compilation (android_arch=x86_64)
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} android_arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/android-x86_64-release' || '' }}
+          platform: android
+          target: release
+          tools: false
+
+      - name: Generate Godot templates
+        run: |
+          cd platform/android/java
+          ./gradlew generateGodotTemplates
+          cd ../../..
+          ls -l bin/
+
+      - name: Upload artifact
+        uses: ./.github/actions/upload-artifact
+        with:
+          name: ${{ matrix.cache-name }}
+  
+  javascript:
+    runs-on: "ubuntu-20.04"
+    name: 🌐 JavaScript ${{ matrix.name }}
+    env:
+      SCONSFLAGS: verbose=yes warnings=all
+      EM_VERSION: 1.39.9
+      EM_CACHE_FOLDER: "emsdk-cache"
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Template (target=release, tools=no)
+            cache-name: javascript-template
+            sconsflags: debug_symbols=no
+            tools: false
+            build-mono: false
+            artifact: true
+
+          - name: Template w/ Mono (target=release, tools=no)
+            cache-name: javascript-template-mono
+            sconsflags: mono_static=yes debug_symbols=no
+            tools: false
+            build-mono: true
+            artifact: true
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download Godot
+        uses: ./.github/actions/godot-download
+
+      - name: Linux dependencies
+        shell: bash
+        run: |
+          # Azure repositories are not reliable, we need to prevent azure giving us packages.
+          sudo rm -f /etc/apt/sources.list.d/*
+          sudo cp -f misc/ci/sources.list /etc/apt/sources.list
+          sudo apt-get update
+          # The actual dependencies
+          sudo apt-get install build-essential pkg-config libx11-dev libxcursor-dev \
+              libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev \
+              libdbus-1-dev libudev-dev libxi-dev libxrandr-dev yasm xvfb unzip \
+              libspeechd-dev speech-dispatcher
+
+      - name: Set up Emscripten latest
+        uses: mymindstorm/setup-emsdk@v11
+        continue-on-error: true
+        with:
+          version: ${{ env.EM_VERSION }}
+          actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
+
+      - name: Verify Emscripten setup
+        run: |
+          emcc -v
+
+      - name: Setup Godot build cache
+        uses: ./.github/actions/godot-cache
+        continue-on-error: true
+
+      - name: Setup python and scons
+        uses: ./.github/actions/godot-deps
+
+      # --------------------------------------------- MONO START --------------------------------------------- #
+      - name: Setup mono
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-release: "wasm-runtime"
+          mono-bcl: "bcl-desktop"
+
+      - name: Mono precompilation
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no
+          platform: linuxbsd
+          tools: true
+
+      # Generate mono glue
+      - name: Generate Mono glue code
+        if: ${{ matrix.build-mono }}
+        run: |
+          DRI_PRIME=0 xvfb-run "./bin/godot.x11.tools.64.mono" --generate-mono-glue modules/mono/glue || true
+
+      - name: Set Mono scons flags
+        if: ${{ matrix.build-mono }}
+        run: |
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_prefix=$HOME/mono-installs/wasm-runtime-release mono_bcl=$HOME/mono-bcls/wasm" >> $GITHUB_ENV
+      # --------------------------------------------- MONO END ----------------------------------------------- #
+
+      - name: Compilation
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }}
+          platform: javascript
+          target: release
+          tools: false
+
+      - name: Upload artifact
+        uses: ./.github/actions/upload-artifact
+        with:
+          name: ${{ matrix.cache-name }}
+  
+  linux:
+    runs-on: "ubuntu-20.04"
+    name: 🐧 Linux ${{ matrix.name }}
+    env:
+      SCONSFLAGS: verbose=yes warnings=all use_static_cpp=yes
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Editor (target=release_debug, tools=yes)
+            cache-name: linux-editor
+            target: release_debug
+            sconsflags: mono_static=yes debug_symbols=no
+            tools: true
+            build-mono: false
+
+          - name: Template (target=release, tools=no)
+            cache-name: linux-template
+            target: release
+            sconsflags: mono_static=yes debug_symbols=no
+            tools: false
+            build-mono: false
+
+          # - name: Editor w/ Mono (target=release_debug, tools=yes)
+          #   cache-name: linux-editor-mono
+          #   target: release_debug
+          #   sconsflags: mono_static=yes
+          #   tools: true
+          #   build-mono: true
+
+          # - name: Template w/ Mono (target=release, tools=no)
+          #   cache-name: linux-template-mono
+          #   target: release
+          #   sconsflags: mono_static=yes debug_symbols=no
+          #   tools: false
+          #   build-mono: true
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download Godot
+        uses: ./.github/actions/godot-download
+
+      - name: Linux dependencies
+        shell: bash
+        run: |
+          sudo apt-get install xvfb libc6-dev
+          
+      - name: Setup Linux toolchain (x86_64)
+        uses: ./.github/actions/godot-linux-toolchain
+        with:
+          toolchain-name: "x86_64-godot-linux-gnu_sdk-buildroot"
+      
+      - name: Setup Linux toolchain (i686)
+        uses: ./.github/actions/godot-linux-toolchain
+        with:
+          toolchain-name: "i686-godot-linux-gnu_sdk-buildroot"
+      
+      # - name: Setup Linux toolchain (arm)
+      #   uses: ./.github/actions/godot-linux-toolchain
+      #   with:
+      #     toolchain-name: "arm-godot-linux-gnueabihf_sdk-buildroot"
+
+      - name: Setup Godot build cache
+        uses: ./.github/actions/godot-cache
+        with:
+          cache-name: ${{ matrix.cache-name }}
+        continue-on-error: true
+
+      - name: Setup python and scons
+        uses: ./.github/actions/godot-deps
+
+      # --------------------------------------------- MONO START --------------------------------------------- #
+      - name: Setup mono (x86_64)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-release: "linux-x86_64"
+          mono-bcl: "bcl-desktop"
+      
+      - name: Setup mono (x86)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-release: "linux-x86"
+      
+      - name: Mono precompilation
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-build
+        with:
+          pre: "PATH=/home/runner/work/SGPhysics2D/SGPhysics2D/x86_64-godot-linux-gnu_sdk-buildroot/bin:$PATH"
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release
+          platform: linuxbsd
+          tools: true
+
+      # Generate mono glue
+      - name: Generate Mono glue code
+        if: ${{ matrix.build-mono }}
+        run: |
+          DRI_PRIME=0 xvfb-run "./bin/godot.x11.tools.64.mono" --generate-mono-glue modules/mono/glue || true
+
+      - name: Set Mono scons flags
+        if: ${{ matrix.build-mono }}
+        run: |
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/net_4_x" >> $GITHUB_ENV
+      # --------------------------------------------- MONO END ----------------------------------------------- #
+      
+      - name: Compilation (bits=64)
+        uses: ./.github/actions/godot-build
+        with:
+          pre: "PATH=/home/runner/work/SGPhysics2D/SGPhysics2D/x86_64-godot-linux-gnu_sdk-buildroot/bin:$PATH"
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }}
+          platform: linuxbsd
+          target: ${{ matrix.target }}
+          tools: ${{ matrix.tools }}
+
+      - name: Compilation (bits=32)
+        uses: ./.github/actions/godot-build
+        with:
+          pre: "PATH=/home/runner/work/SGPhysics2D/SGPhysics2D/i686-godot-linux-gnu_sdk-buildroot/bin:$PATH"
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }}
+          platform: linuxbsd
+          target: ${{ matrix.target }}
+          tools: ${{ matrix.tools }}
+      
+      # - name: Compilation (armv8)
+      #   uses: ./.github/actions/godot-build
+      #   with:
+      #     pre: "PATH=/home/runner/work/SGPhysics2D/SGPhysics2D/arm-godot-linux-gnueabihf_sdk-buildroot/bin:$PATH"
+      #     sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} CCFLAGS="-mtune=cortex-a72 -mcpu=cortex-a72 -mfloat-abi=hard -mlittle-endian -munaligned-access -mfpu=neon-fp-armv8"
+
+      - name: Prepare artifact
+        shell: bash
+        run: |
+          find bin -iname "godot.*" \
+            -exec strip %P {} \; \
+            -exec chmod +x %P {} \;
+
+      - name: Upload artifact
+        uses: ./.github/actions/upload-artifact
+        with:
+          name: ${{ matrix.cache-name }}
+  
+  macos:
+    runs-on: "macos-latest"
+    name: 🍎 macOS ${{ matrix.name }}
+    env:
+      SCONSFLAGS: verbose=yes warnings=all
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Editor (target=release_debug, tools=yes)
+            cache-name: macos-editor
+            target: release_debug
+            tools: true
+            build-mono: false
+
+          - name: Template (target=release, tools=no)
+            cache-name: macos-template
+            target: release
+            sconsflags: debug_symbols=no
+            tools: false
+            build-mono: false
+
+          - name: Editor w/ Mono (target=release_debug, tools=yes)
+            cache-name: macos-editor-mono
+            target: release_debug
+            sconsflags: mono_static=yes
+            tools: true
+            build-mono: true
+
+          - name: Template w/ Mono (target=release, tools=no)
+            cache-name: macos-template-mono
+            target: release
+            sconsflags: mono_static=yes debug_symbols=no
+            tools: false
+            build-mono: true
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download Godot
+        uses: ./.github/actions/godot-download
+
+      - name: Setup Godot build cache
+        uses: ./.github/actions/godot-cache
+        with:
+          cache-name: ${{ matrix.cache-name }}
+        continue-on-error: true
+
+      - name: Setup python and scons
+        uses: ./.github/actions/godot-deps
+
+      # --------------------------------------------- MONO START --------------------------------------------- #
+      - name: Setup mono
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-release: "osx-x86_64"
+          mono-bcl: "bcl-desktop"
+      
+      # NOTE: arm64 release currently doesn't exist
+
+      # - if: ${{ matrix.build-mono }}
+      #   uses: ./.github/actions/godot-mono
+      #   with:
+      #     mono-release: "osx-arm64"
+      
+      - name: Mono precompilation
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no
+          platform: osx
+          tools: true
+
+      # Generate mono glue
+      - name: Generate Mono glue code
+        if: ${{ matrix.build-mono }}
+        run: |
+          DRI_PRIME=0 "./bin/godot.osx.tools.64.mono" --generate-mono-glue modules/mono/glue
+
+      - name: Set Mono scons flags
+        if: ${{ matrix.build-mono }}
+        run: |
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/net_4_x" >> $GITHUB_ENV
+      # --------------------------------------------- MONO END ----------------------------------------------- #
+      
+      - name: Compilation (arch=x86_64)
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-osx-x86_64-release' || '' }}
+          platform: osx
+          target: ${{ matrix.target }}
+          tools: ${{ matrix.tools }}
+
+      # NOTE: arm64 release currently doesn't exist
+
+      # - name: Compilation (arch=arm64)
+      #   uses: ./.github/actions/godot-build
+      #   with:
+      #     sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=arm64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-osx-arm64-release' || '' }}
+      #     platform: osx
+      #     target: ${{ matrix.target }}
+      #     tools: ${{ matrix.tools }}
+
+      - name: Prepare artifact
+        shell: bash
+        run: |
+          find bin -iname "godot.*" \
+            -exec strip %P {} \; \
+            -exec chmod +x %P {} \;
+
+      - name: Upload artifact
+        uses: ./.github/actions/upload-artifact
+        with:
+          name: ${{ matrix.cache-name }}
+  
+  server:
+    runs-on: "ubuntu-20.04"
+    name: ☁ Server ${{ matrix.name }}
+    env:
+      SCONSFLAGS: verbose=yes warnings=all
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux Headless (target=release_debug, tools=yes)
+            cache-name: server-editor
+            target: release_debug
+            sconsflags: mono_static=yes debug_symbols=no
+            tools: true
+            build-mono: false
+
+          - name: Linux Server Template (target=release, tools=no)
+            cache-name: server-template
+            target: release
+            sconsflags: mono_static=yes debug_symbols=no
+            tools: false
+            build-mono: false
+
+          # - name: Linux Headless w/ Mono (target=release_debug, tools=yes)
+          #   cache-name: server-editor-mono
+          #   target: release_debug
+          #   sconsflags: mono_static=yes debug_symbols=no
+          #   tools: true
+          #   build-mono: true
+
+          # - name: Linux Server Template w/ Mono (target=release, tools=no)
+          #   cache-name: server-template-mono
+          #   target: release
+          #   sconsflags: mono_static=yes debug_symbols=no
+          #   tools: false
+          #   build-mono: true
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download Godot
+        uses: ./.github/actions/godot-download
+
+      - name: Linux dependencies
+        shell: bash
+        run: |
+          sudo apt-get install xvfb libc6-dev
+          
+      - name: Setup Linux toolchain (x86_64)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-linux-toolchain
+        with:
+          toolchain-name: "x86_64-godot-linux-gnu_sdk-buildroot"
+      
+      - name: Setup Linux toolchain (i686)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-linux-toolchain
+        with:
+          toolchain-name: "i686-godot-linux-gnu_sdk-buildroot"
+      
+      - name: Setup Linux toolchain (arm)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-linux-toolchain
+        with:
+          toolchain-name: "arm-godot-linux-gnueabihf_sdk-buildroot"
+
+      - name: Setup Godot build cache
+        uses: ./.github/actions/godot-cache
+        with:
+          cache-name: ${{ matrix.cache-name }}
+        continue-on-error: true
+
+      - name: Setup python and scons
+        uses: ./.github/actions/godot-deps
+
+      # --------------------------------------------- MONO START --------------------------------------------- #
+      - name: Setup mono (x86_64)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-release: "linux-x86_64"
+          mono-bcl: "bcl-desktop"
+      
+      - name: Setup mono (x86)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-release: "linux-x86"
+        
+      - name: Mono precompilation
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-build
+        with:
+          pre: "PATH=/home/runner/work/SGPhysics2D/SGPhysics2D/x86_64-godot-linux-gnu_sdk-buildroot/bin:$PATH"
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release
+          platform: linuxbsd
+          tools: true
+
+      # Generate mono glue
+      - name: Generate Mono glue code
+        if: ${{ matrix.build-mono }}
+        run: |
+          DRI_PRIME=0 xvfb-run "./bin/godot.x11.tools.64.mono" --generate-mono-glue modules/mono/glue || true
+
+      - name: Set Mono scons flags
+        if: ${{ matrix.build-mono }}
+        run: |
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/net_4_x" >> $GITHUB_ENV
+      # --------------------------------------------- MONO END ----------------------------------------------- #
+      
+      - name: Compilation (bits=64)
+        uses: ./.github/actions/godot-build
+        with:
+          pre: "PATH=/home/runner/work/SGPhysics2D/SGPhysics2D/x86_64-godot-linux-gnu_sdk-buildroot/bin:$PATH"
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }}
+          platform: server
+          target: ${{ matrix.target }}
+          tools: ${{ matrix.tools }}
+
+      - name: Compilation (bits=32)
+        uses: ./.github/actions/godot-build
+        with:
+          pre: "PATH=/home/runner/work/SGPhysics2D/SGPhysics2D/i686-godot-linux-gnu_sdk-buildroot/bin:$PATH"
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }}
+          platform: server
+          target: ${{ matrix.target }}
+          tools: ${{ matrix.tools }}
+
+      - name: Prepare artifact
+        shell: bash
+        run: |
+          find bin -iname "godot.*" \
+            -exec strip %P {} \; \
+            -exec chmod +x %P {} \;
+
+      - name: Upload artifact
+        uses: ./.github/actions/upload-artifact
+        with:
+          name: ${{ matrix.cache-name }}
+  
+  windows:
+    runs-on: "ubuntu-20.04"
+    name: 🏁 Windows ${{ matrix.name }}
+    env:
+      SCONSFLAGS: verbose=yes warnings=all use_mingw=yes
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Editor (target=release_debug, tools=yes)
+            cache-name: windows-editor
+            target: release_debug
+            tools: true
+            build-mono: false
+
+          - name: Template (target=release, tools=no)
+            cache-name: windows-template
+            target: release
+            sconsflags: debug_symbols=no
+            tools: false
+            build-mono: false
+
+          - name: Editor w/ Mono (target=release_debug, tools=yes)
+            cache-name: windows-editor-mono
+            sconsflags: mono_static=yes
+            target: release_debug
+            tools: true
+            build-mono: true
+
+          - name: Template w/ Mono (target=release, tools=no)
+            cache-name: windows-template-mono
+            target: release
+            sconsflags: mono_static=yes debug_symbols=no
+            tools: false
+            build-mono: true
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download Godot
+        uses: ./.github/actions/godot-download
+
+      - name: Linux dependencies
+        shell: bash
+        run: |
+          # Azure repositories are not reliable, we need to prevent azure giving us packages.
+          sudo rm -f /etc/apt/sources.list.d/*
+          sudo cp -f misc/ci/sources.list /etc/apt/sources.list
+          sudo apt-get update
+          # The actual dependencies
+          sudo apt-get install build-essential pkg-config libx11-dev libxcursor-dev \
+              libxinerama-dev libgl1-mesa-dev libglu-dev libasound2-dev libpulse-dev \
+              libdbus-1-dev libudev-dev libxi-dev libxrandr-dev yasm xvfb unzip \
+              libspeechd-dev speech-dispatcher libgl1-mesa-glx
+      
+      - name: Windows dependencies
+        shell: bash
+        run: |
+          sudo apt-get install mingw-w64
+          echo "1" | sudo update-alternatives --config x86_64-w64-mingw32-gcc
+          echo "1" | sudo update-alternatives --config x86_64-w64-mingw32-g++
+          echo "1" | sudo update-alternatives --config i686-w64-mingw32-gcc
+          echo "1" | sudo update-alternatives --config i686-w64-mingw32-g++
+
+      - name: Setup Godot build cache
+        uses: ./.github/actions/godot-cache
+        with:
+          cache-name: ${{ matrix.cache-name }}
+        continue-on-error: true
+
+      - name: Setup python and scons
+        uses: ./.github/actions/godot-deps
+
+      # --------------------------------------------- MONO START --------------------------------------------- #
+      # Assume mono is already installed on the runner
+      - name: Setup mono (x86_64)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-bcl: "bcl-desktop"
+          mono-release: "windows-x86_64"
+      
+      - name: Setup mono (x86)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-bcl: "bcl-desktop-win32"
+          mono-release: "windows-x86"
+      
+      - name: Setup mono (linux-x86_64)
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-release: "linux-x86_64"
+
+      - name: Mono precompilation
+        if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: mono_static=yes module_mono_enabled=yes mono_glue=no
+          platform: linuxbsd
+          tools: true
+
+      # Generate mono glue
+      - name: Generate Mono glue code
+        if: ${{ matrix.build-mono }}
+        run: |
+          DRI_PRIME=0 xvfb-run "./bin/godot.x11.tools.64.mono" --generate-mono-glue modules/mono/glue || true
+      
+      - name: Set Mono scons flags
+        if: ${{ matrix.build-mono }}
+        run: |
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/net_4_x-win32" >> $GITHUB_ENV
+      # --------------------------------------------- MONO END ----------------------------------------------- #
+
+      - name: Compilation (bits=64)
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86_64-release' || '' }}
+          platform: windows
+          target: ${{ matrix.target }}
+          tools: ${{ matrix.tools }}
+
+      - name: Compilation (bits=32)
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86-release' || '' }}
+          platform: windows
+          target: ${{ matrix.target }}
+          tools: ${{ matrix.tools }}
+
+      - name: Prepare artifact
+        shell: bash
+        run: |
+          find bin -iname "godot.*" \
+            -exec strip %P {} \; \
+            -exec chmod +x %P {} \;
+
+      - name: Upload artifact
+        uses: ./.github/actions/upload-artifact
+        with:
+          name: ${{ matrix.cache-name }}
+  
+  create-release:
+    if: success()
+    needs: [ios, android, javascript, linux, macos, server, windows]
+    name: Create Release
+    runs-on: ubuntu-20.04
+    outputs:
+      release_upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Short SHA
+        id: short-sha
+        run: echo "::set-output name=sha7::$(echo ${GITHUB_SHA} | cut -c1-7)"
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: release-${{ steps.short-sha.outputs.sha7 }}
+          release_name: Release ${{ steps.short-sha.outputs.sha7 }} with ${{ env.GODOT_MONO_BUILD_TAG }}
+          body: |
+            Godot Mono Build Version: ${{ env.GODOT_MONO_BUILD_TAG }}
+          draft: false
+          prerelease: false
+  
+  upload-release-artifacts:
+    if: success()
+    needs: create-release
+    name: Upload Release Artifacts
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        artifact_name: [
+          # Regular builds
+          linux-editor, linux-template, 
+          server-editor, server-template,
+          windows-editor, windows-template, 
+          macos-editor, macos-template,
+          android-template,
+          javascript-template,
+          ios-template,
+
+          # Mono builds
+          # linux-editor-mono, linux-template-mono, 
+          # server-editor-mono, server-template-mono,
+          windows-editor-mono, windows-template-mono, 
+          macos-editor-mono, macos-template-mono,
+          android-template-mono,
+          javascript-template-mono,
+          ios-template-mono
+        ]
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ./
+      - name: Debug
+        shell: bash
+        run: ls
+      - name: Upload Artifact
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.release_upload_url }}
+          asset_path: ./${{ matrix.artifact_name }}.zip
+          asset_name: ${{ matrix.artifact_name }}.zip
+          asset_content_type: application/zip

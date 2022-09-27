@@ -1,0 +1,30 @@
+name: Upload Godot artifact
+description: Upload the Godot artifact.
+inputs:
+  name:
+    description: The artifact name.
+    default: "${{ github.job }}"
+  path:
+    description: The path to upload.
+    required: true
+    default: "bin"
+  compress:
+    description: Whether to compress the artifact or not
+    default: true
+runs:
+  using: "composite"
+  steps:
+    - name: Compress Artifact
+      if: ${{ inputs.compress }}
+      shell: bash
+      run: |
+        pushd ${{ inputs.path }}
+        zip -ry ../${{ inputs.name }}.zip .
+        popd 
+    
+    - name: Upload Godot Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.name }}
+        path: ${{ inputs.name }}.zip
+        retention-days: 14
