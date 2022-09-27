@@ -17,6 +17,9 @@ env:
   # Only used for the cache key. Increment version to force clean build.
   GODOT_BASE_BRANCH: 3.x
   GODOT_MONO_BUILD_TAG: release-fcf205c
+  # Using custom fork because the official repo is broken for linux-mono, and also doesn't have macos arm64 builds.
+  GODOT_MONO_BUILD_REPO: godotengine/godot-mono-builds
+  GODOT_VERSION_STATUS: custom
 
 jobs:
   ios:
@@ -205,18 +208,18 @@ jobs:
         uses: ./.github/actions/godot-deps
 
       # --------------------------------------------- MONO START --------------------------------------------- #
-      - name: Setup mono (arm64)
+      - name: Setup mono (arm64v8)
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
           mono-bcl: "bcl-android"
-          mono-release: "android-arm64-v8a"
+          mono-release: "android-arm64v8"
       
       - name: Setup mono (armv7)
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
-          mono-release: "android-armeabi-v7a"
+          mono-release: "android-armv7"
       
       - name: Setup mono (x86)
         if: ${{ matrix.build-mono }}
@@ -253,7 +256,7 @@ jobs:
       - name: Compilation (android_arch=arm64v8)
         uses: ./.github/actions/godot-build
         with:
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} android_arch=arm64v8 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/android-arm64-v8a-release' || '' }}
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} android_arch=arm64v8 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/android-arm64v8-release' || '' }}
           platform: android
           target: release
           tools: false
@@ -261,7 +264,7 @@ jobs:
       - name: Compilation (android_arch=armv7)
         uses: ./.github/actions/godot-build
         with:
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} android_arch=armv7 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/android-armeabi-v7a-release' || '' }}
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} android_arch=armv7 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/android-armv7-release' || '' }}
           platform: android
           target: release
           tools: false
