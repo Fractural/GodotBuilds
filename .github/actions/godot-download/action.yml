@@ -15,14 +15,3 @@ runs:
       run: |
         curl -fLO https://github.com/godotengine/godot/archive/${{ inputs.version }}.tar.gz
         tar -xvzf ${{ inputs.version }}.tar.gz --strip-components 1 --exclude=".github"
-
-    - name: Download sg-physics
-      shell: bash
-      run: |
-        git clone https://gitlab.com/snopek-games/sg-physics-2d
-        cd sg-physics-2d
-        git reset --hard ${{ inputs.sg-physics-2d-version }}
-
-    - name: Move sg-physics-2d to modules folder
-      shell: bash
-      run: mv sg-physics-2d/godot/modules/sg_physics_2d modules
