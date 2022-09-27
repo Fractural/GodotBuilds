@@ -423,19 +423,19 @@ jobs:
             tools: false
             build-mono: false
 
-          # - name: Editor w/ Mono (target=release_debug, tools=yes)
-          #   cache-name: linux-editor-mono
-          #   target: release_debug
-          #   sconsflags: mono_static=yes
-          #   tools: true
-          #   build-mono: true
+          - name: Editor w/ Mono (target=release_debug, tools=yes)
+            cache-name: linux-editor-mono
+            target: release_debug
+            sconsflags: mono_static=yes
+            tools: true
+            build-mono: true
 
-          # - name: Template w/ Mono (target=release, tools=no)
-          #   cache-name: linux-template-mono
-          #   target: release
-          #   sconsflags: mono_static=yes debug_symbols=no
-          #   tools: false
-          #   build-mono: true
+          - name: Template w/ Mono (target=release, tools=no)
+            cache-name: linux-template-mono
+            target: release
+            sconsflags: mono_static=yes debug_symbols=no
+            tools: false
+            build-mono: true
 
     steps:
       - uses: actions/checkout@v3
