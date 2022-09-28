@@ -30,14 +30,14 @@ runs:
   using: "composite"
   steps:
     - name: Scons Build
-      shell: sh
+      shell: bash
       env:
           SCONSFLAGS: ${{ inputs.sconsflags }}
           SCONS_CACHE: ${{ inputs.scons-cache }}
           SCONS_CACHE_LIMIT: ${{ inputs.scons-cache-limit }}
       run: |
         echo "Building with flags:" ${{ env.SCONSFLAGS }}
-        if [[ ${{ inputs.buildroot != "" }} == true ]]; then
+        if [[ ${{ inputs.buildroot != "" }} ]]; then
           echo "Using buildroot at ${{ inputs.buildroot }}"
           echo "PATH=${{ inputs.buildroot }}:${PATH}" >> $GITHUB_ENV
         fi
