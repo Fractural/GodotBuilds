@@ -404,7 +404,7 @@ jobs:
     runs-on: "ubuntu-20.04"
     name: 🐧 Linux ${{ matrix.name }}
     env:
-      SCONSFLAGS: verbose=yes warnings=all use_static_cpp=yes
+      SCONSFLAGS: verbose=yes warnings=all
     strategy:
       fail-fast: false
       matrix:
