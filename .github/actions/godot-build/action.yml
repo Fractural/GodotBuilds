@@ -37,7 +37,7 @@ runs:
           SCONS_CACHE_LIMIT: ${{ inputs.scons-cache-limit }}
       run: |
         echo "Building with flags:" ${{ env.SCONSFLAGS }}
-        if [[ ${{ inputs.buildroot }} != "" ]]; then
+        if [ ${{ inputs.buildroot }} != "" ]; then
           echo "Using buildroot at ${{ inputs.buildroot }}"
           echo "PATH=${{ inputs.buildroot }}:${PATH}" >> $GITHUB_ENV
         fi
