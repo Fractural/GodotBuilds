@@ -1,8 +1,8 @@
 name: Build Godot
 description: Build Godot with the provided options.
 inputs:
-  pre:
-    description: Runs before scons command
+  buildroot:
+    description: Build root to add to the PATH before building godot
     default: ""
   target:
     description: The scons target (debug/release_debug/release).
@@ -37,5 +37,9 @@ runs:
           SCONS_CACHE_LIMIT: ${{ inputs.scons-cache-limit }}
       run: |
         echo "Building with flags:" ${{ env.SCONSFLAGS }}
-        ${{ inputs.pre }} scons p=${{ inputs.platform }} target=${{ inputs.target }} tools=${{ inputs.tools }} tests=${{ inputs.tests }} ${{ env.SCONSFLAGS }}
+        if [[ ${{ inputs.buildroot }} != "" ]]; then
+          echo "Using buildroot at ${{ inptus.buildroot }}"
+          echo "PATH=${{ input.buildroot }}:${PATH}" >> $GITHUB_ENV
+        fi
+        scons p=${{ inputs.platform }} target=${{ inputs.target }} tools=${{ inputs.tools }} tests=${{ inputs.tests }} ${{ env.SCONSFLAGS }}
         ls -l bin/

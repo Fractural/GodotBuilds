@@ -490,7 +490,7 @@ jobs:
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-build
         with:
-          pre: "PATH=${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin:$PATH"
+          buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
           sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release
           platform: linuxbsd
           tools: true
@@ -510,7 +510,7 @@ jobs:
       - name: Compilation (bits=64)
         uses: ./.github/actions/godot-build
         with:
-          pre: "PATH=${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin:$PATH"
+          buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
           sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }}
           platform: linuxbsd
           target: ${{ matrix.target }}
@@ -519,7 +519,7 @@ jobs:
       - name: Compilation (bits=32)
         uses: ./.github/actions/godot-build
         with:
-          pre: "PATH=${{ github.workspace }}/i686-godot-linux-gnu_sdk-buildroot/bin:$PATH"
+          buildroot: "${{ github.workspace }}/i686-godot-linux-gnu_sdk-buildroot/bin"
           sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }}
           platform: linuxbsd
           target: ${{ matrix.target }}
@@ -528,7 +528,7 @@ jobs:
       # - name: Compilation (armv8)
       #   uses: ./.github/actions/godot-build
       #   with:
-      #     pre: "PATH=${{ github.workspace }}/arm-godot-linux-gnueabihf_sdk-buildroot/bin:$PATH"
+      #     buildroot: "${{ github.workspace }}/arm-godot-linux-gnueabihf_sdk-buildroot/bin"
       #     sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} CCFLAGS="-mtune=cortex-a72 -mcpu=cortex-a72 -mfloat-abi=hard -mlittle-endian -munaligned-access -mfpu=neon-fp-armv8"
 
       - name: Prepare artifact
@@ -752,7 +752,7 @@ jobs:
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-build
         with:
-          pre: "PATH=${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin:$PATH"
+          buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
           sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release
           platform: linuxbsd
           tools: true
@@ -772,7 +772,7 @@ jobs:
       - name: Compilation (bits=64)
         uses: ./.github/actions/godot-build
         with:
-          pre: "PATH=${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin:$PATH"
+          buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
           sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }}
           platform: server
           target: ${{ matrix.target }}
@@ -781,7 +781,7 @@ jobs:
       - name: Compilation (bits=32)
         uses: ./.github/actions/godot-build
         with:
-          pre: "PATH=${{ github.workspace }}/i686-godot-linux-gnu_sdk-buildroot/bin:$PATH"
+          buildroot: "${{ github.workspace }}/i686-godot-linux-gnu_sdk-buildroot/bin"
           sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }}
           platform: server
           target: ${{ matrix.target }}
