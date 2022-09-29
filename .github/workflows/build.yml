@@ -23,7 +23,6 @@ env:
 
 jobs:
   ios:
-    if: false
     runs-on: "macos-latest"
     name: 🍏 iOS ${{ matrix.name }}
     env:
@@ -147,7 +146,6 @@ jobs:
           name: ${{ matrix.cache-name }}
   
   android:
-    if: false
     runs-on: "ubuntu-20.04"
     name: 🤖 Android ${{ matrix.name }}
     env:
@@ -300,7 +298,6 @@ jobs:
           name: ${{ matrix.cache-name }}
   
   javascript:
-    if: false
     runs-on: "ubuntu-20.04"
     name: 🌐 JavaScript ${{ matrix.name }}
     env:
@@ -412,19 +409,19 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # - name: Editor (target=release_debug, tools=yes)
-          #   cache-name: linux-editor
-          #   target: release_debug
-          #   sconsflags: mono_static=yes debug_symbols=no
-          #   tools: true
-          #   build-mono: false
+          - name: Editor (target=release_debug, tools=yes)
+            cache-name: linux-editor
+            target: release_debug
+            sconsflags: mono_static=yes debug_symbols=no
+            tools: true
+            build-mono: false
 
-          # - name: Template (target=release, tools=no)
-          #   cache-name: linux-template
-          #   target: release
-          #   sconsflags: mono_static=yes debug_symbols=no
-          #   tools: false
-          #   build-mono: false
+          - name: Template (target=release, tools=no)
+            cache-name: linux-template
+            target: release
+            sconsflags: mono_static=yes debug_symbols=no
+            tools: false
+            build-mono: false
 
           - name: Editor w/ Mono (target=release_debug, tools=yes)
             cache-name: linux-editor-mono
@@ -547,7 +544,6 @@ jobs:
           name: ${{ matrix.cache-name }}
   
   macos:
-    if: false
     runs-on: "macos-latest"
     name: 🍎 macOS ${{ matrix.name }}
     env:
@@ -664,7 +660,6 @@ jobs:
           name: ${{ matrix.cache-name }}
   
   server:
-    if: false
     runs-on: "ubuntu-20.04"
     name: ☁ Server ${{ matrix.name }}
     env:
@@ -805,7 +800,6 @@ jobs:
           name: ${{ matrix.cache-name }}
   
   windows:
-    if: false
     runs-on: "ubuntu-20.04"
     name: 🏁 Windows ${{ matrix.name }}
     env:
@@ -948,8 +942,7 @@ jobs:
         with:
           name: ${{ matrix.cache-name }}
   
-  create-release:
-    if: false && success() && (
+  create-release: && success() && (
         (github.event_name == 'push') ||
         (github.event_name == 'workflow_dispatch' && inputs.make-release)
       )
@@ -975,8 +968,7 @@ jobs:
           draft: false
           prerelease: false
   
-  upload-release-artifacts:
-    if: false && success() && (
+  upload-release-artifacts: && success() && (
         (github.event_name == 'push') ||
         (github.event_name == 'workflow_dispatch' && inputs.make-release)
       )
