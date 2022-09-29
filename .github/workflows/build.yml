@@ -23,6 +23,7 @@ env:
 
 jobs:
   ios:
+    if: false
     runs-on: "macos-latest"
     name: 🍏 iOS ${{ matrix.name }}
     env:
@@ -146,6 +147,7 @@ jobs:
           name: ${{ matrix.cache-name }}
   
   android:
+    if: false
     runs-on: "ubuntu-20.04"
     name: 🤖 Android ${{ matrix.name }}
     env:
@@ -298,6 +300,7 @@ jobs:
           name: ${{ matrix.cache-name }}
   
   javascript:
+    if: false
     runs-on: "ubuntu-20.04"
     name: 🌐 JavaScript ${{ matrix.name }}
     env:
