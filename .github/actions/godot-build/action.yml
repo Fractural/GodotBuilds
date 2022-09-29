@@ -41,5 +41,5 @@ runs:
         #   echo "Using buildroot at ${{ inputs.buildroot }}"
         #   echo "${{ inputs.buildroot }}" >> $GITHUB_PATH
         # fi
-        ${{ inputs.buildroot != '' && 'PATH=${{ inputs.buildroot }}' || '' }}:PATH scons p=${{ inputs.platform }} target=${{ inputs.target }} tools=${{ inputs.tools }} tests=${{ inputs.tests }} ${{ env.SCONSFLAGS }}
+        ${{ inputs.buildroot != '' && format('PATH={0}', inputs.buildroot) || '' }}:PATH scons p=${{ inputs.platform }} target=${{ inputs.target }} tools=${{ inputs.tools }} tests=${{ inputs.tests }} ${{ env.SCONSFLAGS }}
         ls -l bin/
