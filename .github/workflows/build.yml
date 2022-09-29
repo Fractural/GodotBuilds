@@ -942,7 +942,8 @@ jobs:
         with:
           name: ${{ matrix.cache-name }}
   
-  create-release: && success() && (
+  create-release:
+      if: success() && (
         (github.event_name == 'push') ||
         (github.event_name == 'workflow_dispatch' && inputs.make-release)
       )
@@ -968,7 +969,8 @@ jobs:
           draft: false
           prerelease: false
   
-  upload-release-artifacts: && success() && (
+  upload-release-artifacts: 
+      if: success() && (
         (github.event_name == 'push') ||
         (github.event_name == 'workflow_dispatch' && inputs.make-release)
       )
