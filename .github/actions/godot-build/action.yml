@@ -39,8 +39,8 @@ runs:
         echo "Building with flags:" ${{ env.SCONSFLAGS }}
         if [[ ${{ inputs.buildroot != '' }} ]]; then
           echo "Using buildroot at ${{ inputs.buildroot }}"
-          echo $PATH
           echo "${{ inputs.buildroot }}" >> $GITHUB_PATH
+          echo $PATH
         fi
         scons p=${{ inputs.platform }} target=${{ inputs.target }} tools=${{ inputs.tools }} tests=${{ inputs.tests }} ${{ env.SCONSFLAGS }}
         ls -l bin/
