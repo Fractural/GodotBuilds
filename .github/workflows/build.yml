@@ -412,19 +412,19 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Editor (target=release_debug, tools=yes)
-            cache-name: linux-editor
-            target: release_debug
-            sconsflags: mono_static=yes debug_symbols=no
-            tools: true
-            build-mono: false
+          # - name: Editor (target=release_debug, tools=yes)
+          #   cache-name: linux-editor
+          #   target: release_debug
+          #   sconsflags: mono_static=yes debug_symbols=no
+          #   tools: true
+          #   build-mono: false
 
-          - name: Template (target=release, tools=no)
-            cache-name: linux-template
-            target: release
-            sconsflags: mono_static=yes debug_symbols=no
-            tools: false
-            build-mono: false
+          # - name: Template (target=release, tools=no)
+          #   cache-name: linux-template
+          #   target: release
+          #   sconsflags: mono_static=yes debug_symbols=no
+          #   tools: false
+          #   build-mono: false
 
           - name: Editor w/ Mono (target=release_debug, tools=yes)
             cache-name: linux-editor-mono
