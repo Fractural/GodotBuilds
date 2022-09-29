@@ -544,6 +544,7 @@ jobs:
           name: ${{ matrix.cache-name }}
   
   macos:
+    if: false
     runs-on: "macos-latest"
     name: 🍎 macOS ${{ matrix.name }}
     env:
@@ -660,6 +661,7 @@ jobs:
           name: ${{ matrix.cache-name }}
   
   server:
+    if: false
     runs-on: "ubuntu-20.04"
     name: ☁ Server ${{ matrix.name }}
     env:
@@ -800,6 +802,7 @@ jobs:
           name: ${{ matrix.cache-name }}
   
   windows:
+    if: false
     runs-on: "ubuntu-20.04"
     name: 🏁 Windows ${{ matrix.name }}
     env:
@@ -943,7 +946,7 @@ jobs:
           name: ${{ matrix.cache-name }}
   
   create-release:
-    if: success() && (
+    if: false && success() && (
         (github.event_name == 'push') ||
         (github.event_name == 'workflow_dispatch' && inputs.make-release)
       )
@@ -970,7 +973,7 @@ jobs:
           prerelease: false
   
   upload-release-artifacts:
-    if: success() && (
+    if: false && success() && (
         (github.event_name == 'push') ||
         (github.event_name == 'workflow_dispatch' && inputs.make-release)
       )
