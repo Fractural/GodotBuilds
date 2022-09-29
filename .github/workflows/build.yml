@@ -494,7 +494,7 @@ jobs:
         uses: ./.github/actions/godot-build
         with:
           buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no copy_mono_root=yes mono_bcl=$HOME/mono-bcls/net_4_x mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release
           platform: linuxbsd
           tools: true
 
