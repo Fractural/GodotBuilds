@@ -16,7 +16,7 @@ on:
 env:
   # Only used for the cache key. Increment version to force clean build.
   GODOT_BASE_BRANCH: 3.x
-  GODOT_MONO_BUILD_TAG:  release-bda87f2 # release-413e5e8 # release-fcf205c 
+  GODOT_MONO_BUILD_TAG:  release-df330ce # release-413e5e8 # release-fcf205c 
   # Using custom fork because the official repo is broken for linux-mono, and also doesn't have macos arm64 builds.
   GODOT_MONO_BUILD_REPO: godotengine/godot-mono-builds # fractural/godot-mono-builds # godotengine/godot-mono-builds 
   GODOT_VERSION_STATUS: custom
@@ -602,12 +602,10 @@ jobs:
           mono-release: "osx-x86_64"
           mono-bcl: "bcl-desktop"
       
-      # NOTE: arm64 release currently doesn't exist
-
-      # - if: ${{ matrix.build-mono }}
-      #   uses: ./.github/actions/godot-mono
-      #   with:
-      #     mono-release: "osx-arm64"
+      - if: ${{ matrix.build-mono }}
+        uses: ./.github/actions/godot-mono
+        with:
+          mono-release: "osx-arm64"
       
       - name: Mono precompilation
         if: ${{ matrix.build-mono }}
@@ -637,15 +635,13 @@ jobs:
           target: ${{ matrix.target }}
           tools: ${{ matrix.tools }}
 
-      # NOTE: arm64 release currently doesn't exist
-
-      # - name: Compilation (arch=arm64)
-      #   uses: ./.github/actions/godot-build
-      #   with:
-      #     sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=arm64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-osx-arm64-release' || '' }}
-      #     platform: osx
-      #     target: ${{ matrix.target }}
-      #     tools: ${{ matrix.tools }}
+      - name: Compilation (arch=arm64)
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=arm64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-osx-arm64-release' || '' }}
+          platform: osx
+          target: ${{ matrix.target }}
+          tools: ${{ matrix.tools }}
 
       - name: Prepare artifact
         shell: bash
