@@ -479,8 +479,6 @@ jobs:
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
-          # mono-build-repo: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
-          # mono-build-tag: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
           mono-release: "linux-x86_64"
           mono-bcl: "bcl-desktop"
       
@@ -488,8 +486,6 @@ jobs:
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
-          # mono-build-repo: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
-          # mono-build-tag: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
           mono-release: "linux-x86"
       
       - name: Mono precompilation

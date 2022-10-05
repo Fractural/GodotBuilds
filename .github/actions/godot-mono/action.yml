@@ -12,22 +12,20 @@ inputs:
     default: $HOME/mono-installs
   mono-bcl-path:
     description: Path to dump the mono-bcl into.
-    default: $HOME/mono-bcls
-  mono-build-repo:
-    description: Github repository to download the prebuilt mono releaes from
-    default: ${{ env.GODOT_MONO_BUILD_REPO }}
-  mono-build-tag:
-    description: Release tag to download from the mono-build-repo
-    default: ${{ env.GODOT_MONO_BUILD_TAG }}  
+    default: $HOME/mono-bcls  
 runs:
   using: "composite"
   steps:
+    - name: Setup default inputs
+      run: |
+        if ${{ inputs.mono-build-repo }}
+
     - name: Download mono release ${{ inputs.mono-release }}
       if: ${{ inputs.mono-release != '' }}
       uses: dsaltares/fetch-gh-release-asset@master
       with:
-        repo: "${{ inputs.mono-build-repo }}"
-        version: "tags/${{ inputs.mono-build-tag }}"
+        repo: "${{ env.GODOT_MONO_BUILD_REPO }}"
+        version: "tags/${{ env.GODOT_MONO_BUILD_TAG }}"
         file: "${{ inputs.mono-release }}.zip"
     
     - name: Extract mono release
@@ -40,8 +38,8 @@ runs:
       if: ${{ inputs.mono-bcl != '' }}
       uses: dsaltares/fetch-gh-release-asset@master
       with:
-        repo: "${{ inputs.mono-build-repo }}"
-        version: "tags/${{ inputs.mono-build-tag }}"
+        repo: "${{ env.GODOT_MONO_BUILD_REPO }}"
+        version: "tags/${{ env.GODOT_MONO_BUILD_TAG }}"
         file: "${{ inputs.mono-bcl }}.zip"
     
     - name: Extract mono base class library
