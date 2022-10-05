@@ -129,7 +129,7 @@ jobs:
           mkdir -p bin/ios
           mkdir -p bin/ios/iphone-mono-libs
 
-          if [[ ${{ matrix.build-mono }} ]]; then
+          if ${{ matrix.build-mono }}; then
            
             # Mono bundling
 
@@ -662,7 +662,7 @@ jobs:
           cp bin/godot.osx.opt.debug.universal osx_template.app/Contents/MacOS/godot_osx_debug.64
           chmod +x osx_template.app/Contents/MacOS/godot_osx*
  
-          if [[ ${{ matrix.build-mono }} ]]; then
+          if ${{ matrix.build-mono }}; then
             mv bin/GodotSharp "bin/data.mono.osx.64.${{ matrix.target }}"
             mv bin/godot.server.opt.tools.64.mono "bin/server_64_${{ matrix.target }}"
           else
@@ -804,7 +804,7 @@ jobs:
       - name: Package Export template (bits=64)
         if: ${{ !matrix.tools }}
         run: | 
-          if [[ ${{ matrix.build-mono }} ]]; then
+          if ${{ matrix.build-mono }}; then
             mv bin/GodotSharp "bin/data.mono.server.64.${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}"
             mv bin/godot.server.opt.tools.64.mono "bin/server_64_${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}"
           else
@@ -823,7 +823,7 @@ jobs:
       - name: Package Export template (bits=32)
         if: ${{ !matrix.tools }}
         run: | 
-          if [[ ${{ matrix.build-mono }} ]]; then
+          if ${{ matrix.build-mono }}; then
             mv bin/GodotSharp "bin/data.mono.server.32.${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}"
             mv bin/godot.server.opt.tools.32.mono "bin/server_32_${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}"
           else
@@ -969,7 +969,7 @@ jobs:
       - name: Package Export template (bits=64)
         if: ${{ !matrix.tools }}
         run: | 
-          if [[ ${{ matrix.build-mono }} ]]; then
+          if ${{ matrix.build-mono }}; then
             mv bin/GodotSharp "bin/data.mono.windows.64.${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}"
             mv bin/godot.windows.opt.tools.64.mono.exe "bin/windows_64_${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}.exe"
           else
@@ -987,7 +987,7 @@ jobs:
       - name: Package Export template (bits=32)
         if: ${{ !matrix.tools }}
         run: | 
-          if [[ ${{ matrix.build-mono }} ]]; then
+          if ${{ matrix.build-mono }}; then
             mv bin/GodotSharp "bin/data.mono.windows.32.${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}
             mv bin/godot.windows.opt.tools.32.mono.exe "bin/windows_32_${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}.exe"
           else
