@@ -541,9 +541,10 @@ jobs:
         shell: bash
         run: |
           rm -p godot.x11.tools.64.mono
-          find bin -iname "godot.*" \
-            -exec strip '%p' {} \; \
-            -exec chmod +x '%p' {} \;
+          if ${{ matrix.target == 'release' }}; then
+            find bin -iname "godot.*" -exec strip "{}" \;
+          fi
+          find bin -iname "godot.*" -exec chmod +x "{}" \;
 
       - name: Upload artifact
         uses: ./.github/actions/upload-artifact
@@ -673,9 +674,10 @@ jobs:
         shell: bash
         run: |
           rm -p godot.x11.tools.64.mono
-          find bin -iname "godot.*" \
-            -exec strip '%p' {} \; \
-            -exec chmod +x '%p' {} \;
+          if ${{ matrix.target == 'release' }}; then
+            find bin -iname "godot.*" -exec strip "{}" \;
+          fi
+          find bin -iname "godot.*" -exec chmod +x "{}" \;
 
       - name: Upload artifact
         uses: ./.github/actions/upload-artifact
@@ -834,9 +836,10 @@ jobs:
         shell: bash
         run: |
           rm -p godot.x11.tools.64.mono
-          find bin -iname "godot.*" \
-            -exec strip '%p' {} \; \
-            -exec chmod +x '%p' {} \;
+          if ${{ matrix.target == 'release' }}; then
+            find bin -iname "godot.*" -exec strip "{}" \;
+          fi
+          find bin -iname "godot.*" -exec chmod +x "{}" \;
 
       - name: Upload artifact
         uses: ./.github/actions/upload-artifact
@@ -998,9 +1001,10 @@ jobs:
         shell: bash
         run: |
           rm -p godot.x11.tools.64.mono
-          find bin -iname "godot.*" \
-            -exec strip '%p' {} \; \
-            -exec chmod +x '%p' {} \;
+          if ${{ matrix.target == 'release' }}; then
+            find bin -iname "godot.*" -exec strip "{}" \;
+          fi
+          find bin -iname "godot.*" -exec chmod +x "{}" \;
 
       - name: Upload artifact
         uses: ./.github/actions/upload-artifact
