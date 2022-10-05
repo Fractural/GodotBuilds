@@ -16,11 +16,11 @@ on:
 env:
   # Only used for the cache key. Increment version to force clean build.
   GODOT_BASE_BRANCH: 3.x
-  GODOT_MONO_BUILD_TAG: release-83731ff # mono-6.12.0.182
+  GODOT_MONO_BUILD_TAG: release-0f99f4b # mono-6.12.0.182
   GODOT_MONO_BUILD_REPO: fractural/godot-mono-builds
   # Linux builds require an older release of mono for some reason
-  GODOT_MONO_LINUX_BUILD_TAG: release-aa9e050 # mono-6.12.0.144
-  GODOT_MONO_LINUX_BUILD_REPO: godotengine/godot-mono-builds
+  # GODOT_MONO_LINUX_BUILD_TAG: release-aa9e050 # mono-6.12.0.144
+  # GODOT_MONO_LINUX_BUILD_REPO: godotengine/godot-mono-builds
   GODOT_VERSION_STATUS: custom
 
 jobs:
@@ -129,7 +129,7 @@ jobs:
           mkdir -p bin/ios
           mkdir -p bin/ios/iphone-mono-libs
 
-          if [[ ${{ matrix.build-mono }} == true ]]; then
+          if [[ ${{ matrix.build-mono }} ]]; then
            
             # Mono bundling
 
@@ -479,8 +479,8 @@ jobs:
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
-          mono-build-repo: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
-          mono-build-tag: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
+          # mono-build-repo: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
+          # mono-build-tag: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
           mono-release: "linux-x86_64"
           mono-bcl: "bcl-desktop"
       
@@ -488,8 +488,8 @@ jobs:
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
-          mono-build-repo: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
-          mono-build-tag: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
+          # mono-build-repo: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
+          # mono-build-tag: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
           mono-release: "linux-x86"
       
       - name: Mono precompilation
@@ -540,9 +540,10 @@ jobs:
       - name: Prepare artifact
         shell: bash
         run: |
+          rm -p godot.x11.tools.64.mono
           find bin -iname "godot.*" \
-            -exec strip %P {} \; \
-            -exec chmod +x %P {} \;
+            -exec strip '%p' {} \; \
+            -exec chmod +x '%p' {} \;
 
       - name: Upload artifact
         uses: ./.github/actions/upload-artifact
@@ -649,12 +650,32 @@ jobs:
           target: ${{ matrix.target }}
           tools: ${{ matrix.tools }}
 
+      - name: Package Export Templates (arch=arm64, x86_64)
+        if: ${{ matrix.tools }}
+        runs: |
+          lipo -create bin/godot.osx.opt.${{ matrix.template != '' && format({0}'.', matrix.template) || '' }}x86_64 \
+            bin/godot.osx.opt.${{ matrix.template != '' && format({0}'.', matrix.template) || '' }}arm64 \
+            -output bin/godot.osx.opt.${{ matrix.template != '' && format({0}'.', matrix.template) || '' }}universal
+          cp -r misc/dist/osx_template.app .
+          mkdir -p osx_template.app/Contents/MacOS
+          cp bin/godot.osx.opt.universal osx_template.app/Contents/MacOS/godot_osx_release.64
+          cp bin/godot.osx.opt.debug.universal osx_template.app/Contents/MacOS/godot_osx_debug.64
+          chmod +x osx_template.app/Contents/MacOS/godot_osx*
+ 
+          if [[ ${{ matrix.build-mono }} ]]; then
+            mv bin/GodotSharp "bin/data.mono.osx.64.${{ matrix.target }}"
+            mv bin/godot.server.opt.tools.64.mono "bin/server_64_${{ matrix.target }}"
+          else
+            mv bin/godot.server.opt.tools.64 "bin/server_64_${{ matrix.target }}"
+          fi
+
       - name: Prepare artifact
         shell: bash
         run: |
+          rm -p godot.x11.tools.64.mono
           find bin -iname "godot.*" \
-            -exec strip %P {} \; \
-            -exec chmod +x %P {} \;
+            -exec strip '%p' {} \; \
+            -exec chmod +x '%p' {} \;
 
       - name: Upload artifact
         uses: ./.github/actions/upload-artifact
@@ -780,6 +801,16 @@ jobs:
           target: ${{ matrix.target }}
           tools: ${{ matrix.tools }}
 
+      - name: Package Export template (bits=64)
+        if: ${{ matrix.tools }}
+        runs: | 
+          if [[ ${{ matrix.build-mono }} ]]; then
+            mv bin/GodotSharp "bin/data.mono.server.64.${{ matrix.target }}"
+            mv bin/godot.server.opt.tools.64.mono "bin/server_64_${{ matrix.target }}"
+          else
+            mv bin/godot.server.opt.tools.64 "bin/server_64_${{ matrix.target }}"
+          fi
+
       - name: Compilation (bits=32)
         uses: ./.github/actions/godot-build
         with:
@@ -789,12 +820,23 @@ jobs:
           target: ${{ matrix.target }}
           tools: ${{ matrix.tools }}
 
+      - name: Package Export template (bits=32)
+        if: ${{ matrix.tools }}
+        runs: | 
+          if [[ ${{ matrix.build-mono }} ]]; then
+            mv bin/GodotSharp "bin/data.mono.server.32.${{ matrix.target }}"
+            mv bin/godot.server.opt.tools.32.mono "bin/server_32_${{ matrix.target }}"
+          else
+            mv bin/godot.server.opt.tools.32 "bin/server_32_${{ matrix.target }}"
+          fi
+        
       - name: Prepare artifact
         shell: bash
         run: |
+          rm -p godot.x11.tools.64.mono
           find bin -iname "godot.*" \
-            -exec strip %P {} \; \
-            -exec chmod +x %P {} \;
+            -exec strip '%p' {} \; \
+            -exec chmod +x '%p' {} \;
 
       - name: Upload artifact
         uses: ./.github/actions/upload-artifact
@@ -923,7 +965,17 @@ jobs:
           platform: windows
           target: ${{ matrix.target }}
           tools: ${{ matrix.tools }}
-
+      
+      - name: Package Export template (bits=64)
+        if: ${{ matrix.tools }}
+        runs: | 
+          if [[ ${{ matrix.build-mono }} ]]; then
+            mv bin/GodotSharp "bin/data.mono.windows.64.${{ matrix.target }}"
+            mv bin/godot.windows.opt.tools.64.mono.exe "bin/windows_64_${{ matrix.target }}.exe"
+          else
+            mv bin/godot.windows.opt.tools.64.exe "bin/windows_64_${{ matrix.target }}.exe"
+          fi
+      
       - name: Compilation (bits=32)
         uses: ./.github/actions/godot-build
         with:
@@ -932,12 +984,23 @@ jobs:
           target: ${{ matrix.target }}
           tools: ${{ matrix.tools }}
 
+      - name: Package Export template (bits=32)
+        if: ${{ matrix.tools }}
+        runs: | 
+          if [[ ${{ matrix.build-mono }} ]]; then
+            mv bin/GodotSharp "bin/data.mono.windows.32.${{ matrix.target }}"
+            mv bin/godot.windows.opt.tools.32.mono.exe "bin/windows_32_${{ matrix.target }}.exe"
+          else
+            mv bin/godot.windows.opt.tools.32.exe "bin/windows_32_${{ matrix.target }}.exe"
+          fi
+
       - name: Prepare artifact
         shell: bash
         run: |
+          rm -p godot.x11.tools.64.mono
           find bin -iname "godot.*" \
-            -exec strip %P {} \; \
-            -exec chmod +x %P {} \;
+            -exec strip '%p' {} \; \
+            -exec chmod +x '%p' {} \;
 
       - name: Upload artifact
         uses: ./.github/actions/upload-artifact
