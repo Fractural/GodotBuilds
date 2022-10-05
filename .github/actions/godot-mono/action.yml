@@ -16,10 +16,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Setup default inputs
-      run: |
-        if ${{ inputs.mono-build-repo }}
-
     - name: Download mono release ${{ inputs.mono-release }}
       if: ${{ inputs.mono-release != '' }}
       uses: dsaltares/fetch-gh-release-asset@master
