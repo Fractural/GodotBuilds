@@ -652,7 +652,7 @@ jobs:
 
       - name: Package Export Templates (arch=arm64, x86_64)
         if: ${{ matrix.tools }}
-        runs: |
+        run: |
           lipo -create bin/godot.osx.opt.${{ matrix.template != '' && format({0}'.', matrix.template) || '' }}x86_64 \
             bin/godot.osx.opt.${{ matrix.template != '' && format({0}'.', matrix.template) || '' }}arm64 \
             -output bin/godot.osx.opt.${{ matrix.template != '' && format({0}'.', matrix.template) || '' }}universal
@@ -803,7 +803,7 @@ jobs:
 
       - name: Package Export template (bits=64)
         if: ${{ matrix.tools }}
-        runs: | 
+        run: | 
           if [[ ${{ matrix.build-mono }} ]]; then
             mv bin/GodotSharp "bin/data.mono.server.64.${{ matrix.target }}"
             mv bin/godot.server.opt.tools.64.mono "bin/server_64_${{ matrix.target }}"
@@ -822,7 +822,7 @@ jobs:
 
       - name: Package Export template (bits=32)
         if: ${{ matrix.tools }}
-        runs: | 
+        run: | 
           if [[ ${{ matrix.build-mono }} ]]; then
             mv bin/GodotSharp "bin/data.mono.server.32.${{ matrix.target }}"
             mv bin/godot.server.opt.tools.32.mono "bin/server_32_${{ matrix.target }}"
@@ -968,7 +968,7 @@ jobs:
       
       - name: Package Export template (bits=64)
         if: ${{ matrix.tools }}
-        runs: | 
+        run: | 
           if [[ ${{ matrix.build-mono }} ]]; then
             mv bin/GodotSharp "bin/data.mono.windows.64.${{ matrix.target }}"
             mv bin/godot.windows.opt.tools.64.mono.exe "bin/windows_64_${{ matrix.target }}.exe"
@@ -986,7 +986,7 @@ jobs:
 
       - name: Package Export template (bits=32)
         if: ${{ matrix.tools }}
-        runs: | 
+        run: | 
           if [[ ${{ matrix.build-mono }} ]]; then
             mv bin/GodotSharp "bin/data.mono.windows.32.${{ matrix.target }}"
             mv bin/godot.windows.opt.tools.32.mono.exe "bin/windows_32_${{ matrix.target }}.exe"
