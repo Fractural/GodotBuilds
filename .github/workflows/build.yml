@@ -651,11 +651,11 @@ jobs:
           tools: ${{ matrix.tools }}
 
       - name: Package Export Templates (arch=arm64, x86_64)
-        if: ${{ matrix.tools }}
+        if: ${{ !matrix.tools }}
         run: |
-          lipo -create bin/godot.osx.opt.${{ matrix.template != '' && format({0}'.', matrix.template) || '' }}x86_64 \
-            bin/godot.osx.opt.${{ matrix.template != '' && format({0}'.', matrix.template) || '' }}arm64 \
-            -output bin/godot.osx.opt.${{ matrix.template != '' && format({0}'.', matrix.template) || '' }}universal
+          lipo -create bin/godot.osx.opt.${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}x86_64 \
+            bin/godot.osx.opt.${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}arm64 \
+            -output bin/godot.osx.opt.${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}universal
           cp -r misc/dist/osx_template.app .
           mkdir -p osx_template.app/Contents/MacOS
           cp bin/godot.osx.opt.universal osx_template.app/Contents/MacOS/godot_osx_release.64
@@ -802,13 +802,13 @@ jobs:
           tools: ${{ matrix.tools }}
 
       - name: Package Export template (bits=64)
-        if: ${{ matrix.tools }}
+        if: ${{ !matrix.tools }}
         run: | 
           if [[ ${{ matrix.build-mono }} ]]; then
-            mv bin/GodotSharp "bin/data.mono.server.64.${{ matrix.target }}"
-            mv bin/godot.server.opt.tools.64.mono "bin/server_64_${{ matrix.target }}"
+            mv bin/GodotSharp "bin/data.mono.server.64.${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}"
+            mv bin/godot.server.opt.tools.64.mono "bin/server_64_${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}"
           else
-            mv bin/godot.server.opt.tools.64 "bin/server_64_${{ matrix.target }}"
+            mv bin/godot.server.opt.tools.64 "bin/server_64_${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}"
           fi
 
       - name: Compilation (bits=32)
@@ -821,11 +821,11 @@ jobs:
           tools: ${{ matrix.tools }}
 
       - name: Package Export template (bits=32)
-        if: ${{ matrix.tools }}
+        if: ${{ !matrix.tools }}
         run: | 
           if [[ ${{ matrix.build-mono }} ]]; then
-            mv bin/GodotSharp "bin/data.mono.server.32.${{ matrix.target }}"
-            mv bin/godot.server.opt.tools.32.mono "bin/server_32_${{ matrix.target }}"
+            mv bin/GodotSharp "bin/data.mono.server.32.${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}"
+            mv bin/godot.server.opt.tools.32.mono "bin/server_32_${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}"
           else
             mv bin/godot.server.opt.tools.32 "bin/server_32_${{ matrix.target }}"
           fi
@@ -967,13 +967,13 @@ jobs:
           tools: ${{ matrix.tools }}
       
       - name: Package Export template (bits=64)
-        if: ${{ matrix.tools }}
+        if: ${{ !matrix.tools }}
         run: | 
           if [[ ${{ matrix.build-mono }} ]]; then
-            mv bin/GodotSharp "bin/data.mono.windows.64.${{ matrix.target }}"
-            mv bin/godot.windows.opt.tools.64.mono.exe "bin/windows_64_${{ matrix.target }}.exe"
+            mv bin/GodotSharp "bin/data.mono.windows.64.${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}"
+            mv bin/godot.windows.opt.tools.64.mono.exe "bin/windows_64_${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}.exe"
           else
-            mv bin/godot.windows.opt.tools.64.exe "bin/windows_64_${{ matrix.target }}.exe"
+            mv bin/godot.windows.opt.tools.64.exe "bin/windows_64_${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}.exe"
           fi
       
       - name: Compilation (bits=32)
@@ -985,13 +985,13 @@ jobs:
           tools: ${{ matrix.tools }}
 
       - name: Package Export template (bits=32)
-        if: ${{ matrix.tools }}
+        if: ${{ !matrix.tools }}
         run: | 
           if [[ ${{ matrix.build-mono }} ]]; then
-            mv bin/GodotSharp "bin/data.mono.windows.32.${{ matrix.target }}"
-            mv bin/godot.windows.opt.tools.32.mono.exe "bin/windows_32_${{ matrix.target }}.exe"
+            mv bin/GodotSharp "bin/data.mono.windows.32.${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}
+            mv bin/godot.windows.opt.tools.32.mono.exe "bin/windows_32_${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}.exe"
           else
-            mv bin/godot.windows.opt.tools.32.exe "bin/windows_32_${{ matrix.target }}.exe"
+            mv bin/godot.windows.opt.tools.32.exe "bin/windows_32_${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}.exe"
           fi
 
       - name: Prepare artifact
