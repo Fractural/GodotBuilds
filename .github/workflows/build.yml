@@ -21,6 +21,8 @@ env:
   # Linux builds require an older release of mono for some reason
   # GODOT_MONO_LINUX_BUILD_TAG: release-aa9e050 # mono-6.12.0.144
   # GODOT_MONO_LINUX_BUILD_REPO: godotengine/godot-mono-builds
+  GODOT_BASE_VERSION: 3.5
+  GODOT_BASE_VERSION_STATUS: stable
   GODOT_VERSION_STATUS: custom
 
 jobs:
@@ -33,14 +35,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Template (target=release, tools=no)
+          - name: Template (target=release;debug, tools=no)
             cache-name: ios-template
             sconsflags: debug_symbols=no
             tools: false
             build-mono: false
             artifact: true
 
-          - name: Template w/ Mono (target=release, tools=no)
+          - name: Template w/ Mono (target=release;debug, tools=no)
             cache-name: ios-template-mono
             sconsflags: mono_static=yes debug_symbols=no
             tools: false
@@ -52,6 +54,8 @@ jobs:
 
       - name: Download Godot
         uses: ./.github/actions/godot-download
+        with:
+          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
 
       - name: Setup Godot build cache
         uses: ./.github/actions/godot-cache
@@ -93,17 +97,8 @@ jobs:
         run: |
           echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/monotouch" >> $GITHUB_ENV
       # --------------------------------------------- MONO END ----------------------------------------------- #
-
-      # - name: Compilation (arch=arm)
-      #   uses: ./.github/actions/godot-build
-      #   with:
-      #     # Using arm64 mono for now -- not sure if this is allowed
-      #     sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=arm ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/ios-arm64-release' || '' }}
-      #     platform: iphone
-      #     target: release
-      #     tools: false
       
-      - name: Compilation (arch=arm64)
+      - name: Compilation (arch=arm64, target=release)
         uses: ./.github/actions/godot-build
         with:
           sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=arm64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/ios-arm64-release' || '' }}
@@ -111,7 +106,7 @@ jobs:
           target: release
           tools: false
       
-      - name: Compilation (arch=x86_64 ios_simulator=yes)
+      - name: Compilation (arch=x86_64, ios_simulator=yes, target=release)
         uses: ./.github/actions/godot-build
         with:
           sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ios_simulator=yes ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/ios-x86_64-release' || '' }}
@@ -119,32 +114,58 @@ jobs:
           target: release
           tools: false
       
+            - name: Compilation (arch=arm64, target=debug)
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=arm64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/ios-arm64-release' || '' }}
+          platform: iphone
+          target: debug
+          tools: false
+      
+      - name: Compilation (arch=x86_64, ios_simulator=yes, target=debug)
+        uses: ./.github/actions/godot-build
+        with:
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ios_simulator=yes ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/ios-x86_64-release' || '' }}
+          platform: iphone
+          target: debug
+          tools: false
+
       - name: Bundle builds
         shell: bash
         run: |
           echo $(basename bin/*)
 
-          lipo -create bin/libgodot.iphone.opt.arm64.a bin/libgodot.iphone.opt.x86_64.simulator.a -output bin/libgodot.iphone.release.fat.a
+          cp bin/libgodot.iphone.opt.arm64.a $HOME/out/templates/libgodot.iphone.a
+          cp bin/libgodot.iphone.opt.debug.arm64.a $HOME/out/templates/libgodot.iphone.debug.a
 
-          mkdir -p bin/ios
-          mkdir -p bin/ios/iphone-mono-libs
+          cp bin/libgodot.iphone.opt.x86_64.simulator.a $HOME/out/templates/libgodot.iphone.simulator.a
+          cp bin/libgodot.iphone.opt.debug.x86_64.simulator.a $HOME/out/templates/libgodot.iphone.debug.simulator.a
 
           if ${{ matrix.build-mono }}; then
-           
-            # Mono bundling
+            cp -r misc/dist/iphone-mono-libs $HOME/out/templates/iphone-mono-libs
 
-            lipo -create bin/libmonosgen-2.0.iphone.arm64.a bin/libmonosgen-2.0.iphone.x86_64.simulator.a -output bin/ios/iphone-mono-libs/libmonosgen-2.0.iphone.fat.a
-            lipo -create bin/libmono-native.iphone.arm64.a bin/libmono-native.iphone.x86_64.simulator.a -output bin/ios/iphone-mono-libs/libmono-native.iphone.fat.a
-            lipo -create bin/libmono-profiler-log.iphone.arm64.a bin/libmono-profiler-log.iphone.x86_64.simulator.a -output bin/ios/iphone-mono-libs/libmono-profiler-log.iphone.fat.a
+            cp bin/libmonosgen-2.0.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmonosgen-2.0.xcframework/ios-arm64/libmonosgen.a
+            cp bin/libmono-native.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-native.xcframework/ios-arm64/libmono-native.a
+            cp bin/libmono-profiler-log.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-profiler-log.xcframework/ios-arm64/libmono-profiler-log.a
 
-            lipo -create bin/libmono-ee-interp.iphone.arm64.a -output bin/ios/iphone-mono-libs/libmono-ee-interp.iphone.fat.a
-            lipo -create bin/libmono-icall-table.iphone.arm64.a -output bin/ios/iphone-mono-libs/libmono-icall-table.iphone.fat.a
-            lipo -create bin/libmono-ilgen.iphone.arm64.a -output bin/ios/iphone-mono-libs/libmono-ilgen.iphone.fat.a
+            simulator.a -output $HOME/out/templates/iphone-mono-libs/libmono-profiler-log.xcframework/ios-arm64_x86_64-simulator/libmono-profiler-log.a
+            cp bin/libmonosgen-2.0.iphone.x86_64.simulator.a $HOME/out/templates/iphone-mono-libs/libmonosgen-2.0.xcframework/ios-arm64_x86_64-simulator/libmonosgen.a
+            cp bin/libmono-native.iphone.x86_64.simulator.a $HOME/out/templates/iphone-mono-libs/libmono-native.xcframework/ios-arm64_x86_64-simulator/libmono-native.a
+            cp bin/libmono-profiler-log.iphone.x86_64.simulator.a $HOME/out/templates/iphone-mono-libs/libmono-profiler-log.xcframework/ios-arm64_x86_64-simulator/libmono-profiler-log.a
+
+            # The Mono libraries for the interpreter are not available for simulator builds
+            cp bin/libmono-ee-interp.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-ee-interp.xcframework/ios-arm64/libmono-ee-interp.a
+            cp bin/libmono-icall-table.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-icall-table.xcframework/ios-arm64/libmono-icall-table.a
+            cp bin/libmono-ilgen.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-ilgen.xcframework/ios-arm64/libmono-ilgen.a
+
+            mkdir -p $HOME/out/templates/bcl
+            cp -r $HOME/mono-installs/ios-bcl/* $HOME/out/templates/bcl
           fi
 
       - name: Upload artifact
         uses: ./.github/actions/upload-artifact
         with:
+          path: $HOME/out/templates
           name: ${{ matrix.cache-name }}
   
   android:
@@ -175,6 +196,8 @@ jobs:
 
       - name: Download Godot
         uses: ./.github/actions/godot-download
+        with:
+          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
 
       - name: Linux dependencies
         shell: bash
@@ -329,6 +352,8 @@ jobs:
 
       - name: Download Godot
         uses: ./.github/actions/godot-download
+        with:
+          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
 
       - name: Linux dependencies
         shell: bash
@@ -397,6 +422,12 @@ jobs:
           target: release
           tools: false
 
+      - name: Package Export Template
+        if: ${{ !matrix.tools }}
+        run: |
+          find bin ! -name 'godot.javascript.${{ matrix.target == 'release' && 'opt' || 'debug' }}.${{ matrix.build-mono && 'mono.' || '' }}.zip' -type f -exec rm -f {} +
+          mv bin/godot.javascript.${{ matrix.target == 'release' && 'opt' || 'debug' }}.${{ matrix.build-mono && 'mono.' || '' }}.zip bin/webassembly_${{ matrix.target }}.zip
+        
       - name: Upload artifact
         uses: ./.github/actions/upload-artifact
         with:
@@ -444,6 +475,8 @@ jobs:
 
       - name: Download Godot
         uses: ./.github/actions/godot-download
+        with:
+          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
 
       - name: Linux dependencies
         shell: bash
@@ -536,7 +569,7 @@ jobs:
       - name: Prepare artifact
         shell: bash
         run: |
-          rm -p godot.x11.tools.64.mono
+          rm godot.x11.tools.64.mono
           if ${{ matrix.target == 'release' }}; then
             find bin -iname "godot.*" -exec strip "{}" \;
           fi
@@ -588,6 +621,8 @@ jobs:
 
       - name: Download Godot
         uses: ./.github/actions/godot-download
+        with:
+          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
 
       - name: Setup Godot build cache
         uses: ./.github/actions/godot-cache
@@ -650,9 +685,7 @@ jobs:
       - name: Package Export Templates (arch=arm64, x86_64)
         if: ${{ !matrix.tools }}
         run: |
-          lipo -create bin/godot.osx.opt.${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}x86_64 \
-            bin/godot.osx.opt.${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}arm64 \
-            -output bin/godot.osx.opt.${{ matrix.target != '' && format('{0}.', matrix.target) || '' }}universal
+          lipo -create bin/godot.osx.opt.x86_64 bin/godot.osx.opt.arm64 -output bin/godot.osx.opt.universal
           cp -r misc/dist/osx_template.app .
           mkdir -p osx_template.app/Contents/MacOS
           cp bin/godot.osx.opt.universal osx_template.app/Contents/MacOS/godot_osx_release.64
@@ -661,15 +694,15 @@ jobs:
  
           if ${{ matrix.build-mono }}; then
             mv bin/GodotSharp "bin/data.mono.osx.64.${{ matrix.target }}"
-            mv bin/godot.server.opt.tools.64.mono "bin/server_64_${{ matrix.target }}"
+            mv bin/godot.server.opt.64.mono "bin/server_64_${{ matrix.target }}"
           else
-            mv bin/godot.server.opt.tools.64 "bin/server_64_${{ matrix.target }}"
+            mv bin/godot.server.opt.64 "bin/server_64_${{ matrix.target }}"
           fi
 
       - name: Prepare artifact
         shell: bash
         run: |
-          rm -p godot.x11.tools.64.mono
+          rm godot.x11.tools.64.mono
           if ${{ matrix.target == 'release' }}; then
             find bin -iname "godot.*" -exec strip "{}" \;
           fi
@@ -722,6 +755,8 @@ jobs:
 
       - name: Download Godot
         uses: ./.github/actions/godot-download
+        with:
+          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
 
       - name: Linux dependencies
         shell: bash
@@ -804,9 +839,9 @@ jobs:
         run: | 
           if ${{ matrix.build-mono }}; then
             mv bin/GodotSharp "bin/data.mono.server.64.${{ matrix.target }}"
-            mv bin/godot.server.opt.tools.64.mono "bin/server_64_${{ matrix.target }}"
+            mv bin/godot.server.opt.64.mono "bin/server_64_${{ matrix.target }}"
           else
-            mv bin/godot.server.opt.tools.64 "bin/server_64_${{ matrix.target }}"
+            mv bin/godot.server.opt.64 "bin/server_64_${{ matrix.target }}"
           fi
 
       - name: Compilation (bits=32)
@@ -823,15 +858,15 @@ jobs:
         run: | 
           if ${{ matrix.build-mono }}; then
             mv bin/GodotSharp "bin/data.mono.server.32.${{ matrix.target }}"
-            mv bin/godot.server.opt.tools.32.mono "bin/server_32_${{ matrix.target }}"
+            mv bin/godot.server.opt.32.mono "bin/server_32_${{ matrix.target }}"
           else
-            mv bin/godot.server.opt.tools.32 "bin/server_32_${{ matrix.target }}"
+            mv bin/godot.server.opt.32 "bin/server_32_${{ matrix.target }}"
           fi
         
       - name: Prepare artifact
         shell: bash
         run: |
-          rm -p godot.x11.tools.64.mono
+          rm godot.x11.tools.64.mono
           if ${{ matrix.target == 'release' }}; then
             find bin -iname "godot.*" -exec strip "{}" \;
           fi
@@ -883,6 +918,8 @@ jobs:
 
       - name: Download Godot
         uses: ./.github/actions/godot-download
+        with:
+          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
 
       - name: Linux dependencies
         shell: bash
@@ -970,9 +1007,9 @@ jobs:
         run: | 
           if ${{ matrix.build-mono }}; then
             mv bin/GodotSharp "bin/data.mono.windows.64.${{ matrix.target }}"
-            mv bin/godot.windows.opt.tools.64.mono.exe "bin/windows_64_${{ matrix.target }}.exe"
+            mv bin/godot.windows.opt.64.mono.exe "bin/windows_64_${{ matrix.target }}.exe"
           else
-            mv bin/godot.windows.opt.tools.64.exe "bin/windows_64_${{ matrix.target }}.exe"
+            mv bin/godot.windows.opt.64.exe "bin/windows_64_${{ matrix.target }}.exe"
           fi
       
       - name: Compilation (bits=32)
@@ -988,15 +1025,15 @@ jobs:
         run: | 
           if ${{ matrix.build-mono }}; then
             mv bin/GodotSharp "bin/data.mono.windows.32.${{ matrix.target }}
-            mv bin/godot.windows.opt.tools.32.mono.exe "bin/windows_32_${{ matrix.target }}.exe"
+            mv bin/godot.windows.opt.32.mono.exe "bin/windows_32_${{ matrix.target }}.exe"
           else
-            mv bin/godot.windows.opt.tools.32.exe "bin/windows_32_${{ matrix.target }}.exe"
+            mv bin/godot.windows.opt.32.exe "bin/windows_32_${{ matrix.target }}.exe"
           fi
 
       - name: Prepare artifact
         shell: bash
         run: |
-          rm -p godot.x11.tools.64.mono
+          rm godot.x11.tools.64.mono
           if ${{ matrix.target == 'release' }}; then
             find bin -iname "godot.*" -exec strip "{}" \;
           fi
@@ -1007,12 +1044,135 @@ jobs:
         with:
           name: ${{ matrix.cache-name }}
   
+  bundle-export-templates:
+    needs: [ios, android, javascript, linux, macos, server, windows]
+    name: Bundle Export Templates
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download Godot
+        uses: ./.github/actions/godot-download
+        with:
+          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
+      
+      - name: Download Linux Template
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-template
+          path: ./
+      
+      - name: Download Windows Template
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-template
+          path: ./
+      
+      - name: Download MacOS Template
+        uses: actions/download-artifact@v3
+        with:
+          name: macos-template
+          path: ./
+      
+      - name: Download Android Template
+        uses: actions/download-artifact@v3
+        with:
+          name: android-template
+          path: ./
+      
+      - name: Download Javascript Template
+        uses: actions/download-artifact@v3
+        with:
+          name: javascript-template
+          path: ./
+
+      - name: Download iOS Template
+        uses: actions/download-artifact@v3
+        with:
+          name: ios-template
+          path: ./
+
+      - name: Unzip Templates
+        run: |
+          find . -iname "*-template.zip" -exec unzip {} \;
+
+      - name: Bundle Templates
+        run: |
+          godot_version=""
+          templates_version=""
+
+          export basedir=$(pwd)
+          export reldir="${basedir}/releases/${godot_version}"
+          export godot_basename="Godot_v${godot_version}"
+          export templatesdir="$HOME/templates"
+
+          # Linux
+          cp linux-template/godot.x11.opt.64 ${templatesdir}/linux_x11_64_release
+          cp linux-template/godot.x11.opt.debug.64 ${templatesdir}/linux_x11_64_debug
+          cp linux-template/godot.x11.opt.32 ${templatesdir}/linux_x11_32_release
+          cp linux-template/godot.x11.opt.debug.32 ${templatesdir}/linux_x11_32_debug
+          strip ${templatesdir}/linux_x11_*
+
+          # Windows
+          cp windows-template/godot.windows.opt.64.exe ${templatesdir}/windows_64_release.exe
+          cp windows-template/godot.windows.opt.debug.64.exe ${templatesdir}/windows_64_debug.exe
+          cp windows-template/godot.windows.opt.32.exe ${templatesdir}/windows_32_release.exe
+          cp windows-template/godot.windows.opt.debug.32.exe ${templatesdir}/windows_32_debug.exe
+          strip ${templatesdir}/windows*.exe
+
+          # MacOS
+          rm -rf osx_template.app
+          cp -r misc/dist/osx_template.app .
+          mkdir -p osx_template.app/Contents/MacOS
+
+          cp macos-template/godot.osx.opt.universal osx_template.app/Contents/MacOS/godot_osx_release.64
+          cp macos-template/godot.osx.opt.debug.universal osx_template.app/Contents/MacOS/godot_osx_debug.64
+          chmod +x osx_template.app/Contents/MacOS/godot_osx*
+          zip -q -9 -r "${templatesdir}/osx.zip" osx_template.app
+          rm -rf osx_template.app
+          # TODO: Create MacOS signing
+          # sign_macos_template ${templatesdir} 0
+
+          # Javascript
+          cp javascript-template/godot.javascript.opt.zip ${templatesdir}/webassembly_release.zip
+          cp javascript-template/godot.javascript.opt.debug.zip ${templatesdir}/webassembly_debug.zip
+
+          # TODO: Create threads and gdnative
+          # cp javascript-template/godot.javascript.opt.threads.zip ${templatesdir}/webassembly_threads_release.zip
+          # cp javascript-template/godot.javascript.opt.debug.threads.zip ${templatesdir}/webassembly_threads_debug.zip
+
+          # cp javascript-template/godot.javascript.opt.gdnative.zip ${templatesdir}/webassembly_gdnative_release.zip
+          # cp javascript-template/godot.javascript.opt.debug.gdnative.zip ${templatesdir}/webassembly_gdnative_debug.zip
+
+          # iOS
+          rm -rf ios_xcode
+          cp -r misc/dist/ios_xcode ios_xcode
+          cp out/ios/templates/libgodot.iphone.simulator.a ios_xcode/libgodot.iphone.release.xcframework/ios-arm64_x86_64-simulator/libgodot.a
+          cp out/ios/templates/libgodot.iphone.debug.simulator.a ios_xcode/libgodot.iphone.debug.xcframework/ios-arm64_x86_64-simulator/libgodot.a
+          cp out/ios/templates/libgodot.iphone.a ios_xcode/libgodot.iphone.release.xcframework/ios-arm64/libgodot.a
+          cp out/ios/templates/libgodot.iphone.debug.a ios_xcode/libgodot.iphone.debug.xcframework/ios-arm64/libgodot.a
+          cd ios_xcode
+          zip -q -9 -r "${templatesdir}/iphone.zip" *
+          cd ..
+          rm -rf ios_xcode
+
+          # Templates TPZ (Classical) #
+          echo "${templates_version}" > ${templatesdir}/version.txt
+          pushd ${templatesdir}/..
+          zip -q -9 -r -D "${reldir}/${godot_basename}_export_templates.tpz" templates/*
+          popd
+
+      - name: Upload artifact
+        uses: ./.`hub/actions/upload-artifact
+        with:
+          name: ${{ matrix.cache-name }}
+
   create-release:
     if: success() && (
         (github.event_name == 'push') ||
         (github.event_name == 'workflow_dispatch' && inputs.make-release)
       )
-    needs: [ios, android, javascript, linux, macos, server, windows]
+    needs: [ios, android, javascript, linux, macos, server, windows, bundle-export-templates]
     name: Create Release
     runs-on: ubuntu-20.04
     outputs:
