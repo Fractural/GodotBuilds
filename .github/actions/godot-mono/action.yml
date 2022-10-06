@@ -57,8 +57,6 @@ runs:
         mkdir -p ${{ inputs.mono-bcl-path }}
         7z x "${{ inputs.mono-bcl }}.zip" -otemp
         pushd temp
-        dirs=(*/)
-        echo "Found directory: ${dirs[0]}"
-        mv -v ${dirs[0]}* ${{ inputs.mono-bcl-path }}
+        mv -v * ${{ inputs.mono-bcl-path }}
         popd
         rm -r temp

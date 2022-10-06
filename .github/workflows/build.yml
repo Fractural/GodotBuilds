@@ -92,7 +92,7 @@ jobs:
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
         run: |
-          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/monotouch" >> $GITHUB_ENV
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/ios-bcl/monotouch" >> $GITHUB_ENV
       
       - name: Clear bin
         run: |
@@ -161,7 +161,7 @@ jobs:
             cp bin/libmono-ilgen.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-ilgen.xcframework/ios-arm64/libmono-ilgen.a
 
             mkdir -p $HOME/out/templates/bcl
-            cp -r $HOME/mono-installs/ios-bcl/* $HOME/out/templates/bcl
+            cp -r $HOME/mono-bcls/ios-bcl/* $HOME/out/templates/bcl
           fi
 
       - name: Upload Templates
@@ -275,7 +275,7 @@ jobs:
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
         run: |
-          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/monodroid" >> $GITHUB_ENV
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/android-bcl/monodroid" >> $GITHUB_ENV
       
       - name: Clear bin
         run: |
@@ -366,7 +366,7 @@ jobs:
 
           if ${{ matrix.build-mono }}; then
             mkdir -p $HOME/out/templates/bcl
-            cp -r $HOME/mono-installs/android-bcl/* $HOME/out/templates/bcl/
+            cp -r $HOME/mono-bcls/android-bcl/* $HOME/out/templates/bcl/
           fi
 
       - name: Upload Templates
@@ -462,7 +462,7 @@ jobs:
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
         run: |
-          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_prefix=$HOME/mono-installs/wasm-runtime-release mono_bcl=$HOME/mono-bcls/wasm" >> $GITHUB_ENV
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_prefix=$HOME/mono-installs/wasm-runtime-release mono_bcl=$HOME/mono-bcls/wasm-bcl/wasm" >> $GITHUB_ENV
       
       - name: Clear bin
         run: |
@@ -494,7 +494,7 @@ jobs:
 
           if ${{ matrix.build-mono }}; then
             mkdir -p $HOME/out/templates/bcl
-            cp -r $HOME/mono-installs/wasm-bcl/wasm $HOME/out/templates/bcl/
+            cp -r $HOME/mono-bcls/wasm-bcl/wasm $HOME/out/templates/bcl/
           fi
         
       - name: Upload Templates
@@ -581,7 +581,7 @@ jobs:
         uses: ./.github/actions/godot-build
         with:
           buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no copy_mono_root=yes mono_bcl=$HOME/mono-bcls/net_4_x mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no copy_mono_root=yes mono_bcl=$HOME/mono-bcls/desktop-bcl/net_4_x mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release
           platform: linuxbsd
           tools: true
 
@@ -594,7 +594,7 @@ jobs:
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
         run: |
-          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/net_4_x" >> $GITHUB_ENV
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/desktop-bcl/net_4_x" >> $GITHUB_ENV
 
       - name: Clear bin
         run: |
@@ -775,7 +775,7 @@ jobs:
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
         run: |
-          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/net_4_x" >> $GITHUB_ENV
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/desktop-bcl/net_4_x" >> $GITHUB_ENV
       
       - name: Clear bin
         run: |
@@ -988,7 +988,7 @@ jobs:
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
         run: |
-          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/net_4_x" >> $GITHUB_ENV
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/desktop-bcl/net_4_x" >> $GITHUB_ENV
       
       - name: Clear bin
         run: |
@@ -1198,7 +1198,7 @@ jobs:
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
         run: |
-          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/net_4_x-win32" >> $GITHUB_ENV
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/desktop-win32-bcl/net_4_x-win32" >> $GITHUB_ENV
       
       - name: Clear bin
         run: |
