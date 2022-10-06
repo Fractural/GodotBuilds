@@ -18,7 +18,7 @@ runs:
       if: ${{ inputs.compress }}
       shell: bash
       run: |
-        zip -ry ${original_dir}/${{ inputs.name }}.zip ${{ inputs.path }}
+        zip -ry ${{ inputs.name }}.zip ${{ inputs.path }}
     
     - name: Upload Godot Artifact
       uses: actions/upload-artifact@v3
