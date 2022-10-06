@@ -140,7 +140,8 @@ jobs:
           mkdir -p $HOME/out/templates
           cp bin/libgodot.iphone.opt.arm64.a $HOME/out/templates/libgodot.iphone.a
           cp bin/libgodot.iphone.opt.debug.arm64.a $HOME/out/templates/libgodot.iphone.debug.a
-
+          #$IOS_LIPO -create bin/libgodot.iphone.opt.arm64.simulator.a bin/libgodot.iphone.opt.x86_64.simulator.a -output $HOME/out/templates-mono/libgodot.iphone.simulator.a
+          #$IOS_LIPO -create bin/libgodot.iphone.opt.debug.arm64.simulator.a bin/libgodot.iphone.opt.debug.x86_64.simulator.a -output $HOME/out/templates-mono/libgodot.iphone.debug.simulator.a
           cp bin/libgodot.iphone.opt.x86_64.simulator.a $HOME/out/templates/libgodot.iphone.simulator.a
           cp bin/libgodot.iphone.opt.debug.x86_64.simulator.a $HOME/out/templates/libgodot.iphone.debug.simulator.a
 
@@ -151,10 +152,12 @@ jobs:
             cp bin/libmono-native.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-native.xcframework/ios-arm64/libmono-native.a
             cp bin/libmono-profiler-log.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-profiler-log.xcframework/ios-arm64/libmono-profiler-log.a
 
-            simulator.a -output $HOME/out/templates/iphone-mono-libs/libmono-profiler-log.xcframework/ios-arm64_x86_64-simulator/libmono-profiler-log.a
-            cp bin/libmonosgen-2.0.iphone.x86_64.simulator.a $HOME/out/templates/iphone-mono-libs/libmonosgen-2.0.xcframework/ios-arm64_x86_64-simulator/libmonosgen.a
-            cp bin/libmono-native.iphone.x86_64.simulator.a $HOME/out/templates/iphone-mono-libs/libmono-native.xcframework/ios-arm64_x86_64-simulator/libmono-native.a
-            cp bin/libmono-profiler-log.iphone.x86_64.simulator.a $HOME/out/templates/iphone-mono-libs/libmono-profiler-log.xcframework/ios-arm64_x86_64-simulator/libmono-profiler-log.a
+            #$IOS_LIPO -create bin/libmonosgen-2.0.iphone.arm64.simulator.a bin/libmonosgen-2.0.iphone.x86_64.simulator.a -output $HOME/out/templates-mono/iphone-mono-libs/libmonosgen-2.0.xcframework/ios-arm64_x86_64-simulator/libmonosgen.a
+            #$IOS_LIPO -create bin/libmono-native.iphone.arm64.simulator.a bin/libmono-native.iphone.x86_64.simulator.a -output $HOME/out/templates-mono/iphone-mono-libs/libmono-native.xcframework/ios-arm64_x86_64-simulator/libmono-native.a
+            #$IOS_LIPO -create bin/libmono-profiler-log.iphone.arm64.simulator.a bin/libmono-profiler-log.iphone.x86_64.simulator.a -output $HOME/out/templates-mono/iphone-mono-libs/libmono-profiler-log.xcframework/ios-arm64_x86_64-simulator/libmono-profiler-log.a
+            cp bin/libmonosgen-2.0.iphone.x86_64.simulator.a $HOME/out/templates-mono/iphone-mono-libs/libmonosgen-2.0.xcframework/ios-arm64_x86_64-simulator/libmonosgen.a
+            cp bin/libmono-native.iphone.x86_64.simulator.a $HOME/out/templates-mono/iphone-mono-libs/libmono-native.xcframework/ios-arm64_x86_64-simulator/libmono-native.a
+            cp bin/libmono-profiler-log.iphone.x86_64.simulator.a $HOME/out/templates-mono/iphone-mono-libs/libmono-profiler-log.xcframework/ios-arm64_x86_64-simulator/libmono-profiler-log.a
 
             # The Mono libraries for the interpreter are not available for simulator builds
             cp bin/libmono-ee-interp.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-ee-interp.xcframework/ios-arm64/libmono-ee-interp.a
@@ -444,7 +447,7 @@ jobs:
         uses: ./.github/actions/godot-mono
         with:
           mono-release: "wasm-runtime"
-          mono-bcl: "bcl-desktop"
+          mono-bcl: "bcl-wasm"
 
       - name: Mono precompilation
         if: ${{ matrix.build-mono }}
@@ -821,7 +824,7 @@ jobs:
           lipo -create bin/godot.osx.opt.tools.x86_64${{ matrix.build-mono && '.mono' || '' }} \
             bin/godot.osx.opt.tools.arm64${{ matrix.build-mono && '.mono' || '' }} \
             -output bin/godot.osx.opt.tools.universal${{ matrix.build-mono && '.mono' || '' }}
-          $STRIP bin/godot.osx.opt.tools.universal
+          $STRIP bin/godot.osx.opt.tools.universal${{ matrix.build-mono && '.mono' || '' }}
 
           if ${{ matrix.build-mono }}; then
             # Make universal versions of the dylibs we use.
