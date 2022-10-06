@@ -804,7 +804,6 @@ jobs:
           # build so that we rely on its config, which has libmono-native.dylib instead of
           # libmono-native-compat.dylib).
           mkdir -p tmp-lib/{x86_64,arm64}
-          find bin | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"
           cp bin/GodotSharp/Mono/lib/*.dylib tmp-lib/x86_64/
 
       - name: Compilation (arch=arm64)
@@ -818,7 +817,6 @@ jobs:
       - name: Dylib Wrangling
         if: ${{ matrix.build-mono }}
         run: |
-          find bin | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"
           cp bin/GodotSharp/Mono/lib/*.dylib tmp-lib/arm64/
           echo "tmp-lib:"
           find tmp-lib | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"
@@ -832,7 +830,7 @@ jobs:
 
           if ${{ matrix.build-mono }}; then
             # Make universal versions of the dylibs we use.
-            lipo -create tmp-lib/x86_64/libmono-native-compat.dylib tmp-lib/arm64/libmono-native.dylib -output tmp-lib/libmono-native.dylib
+            lipo -create tmp-lib/x86_64/libmono-native.dylib tmp-lib/arm64/libmono-native.dylib -output tmp-lib/libmono-native.dylib
             lipo -create tmp-lib/x86_64/libMonoPosixHelper.dylib tmp-lib/arm64/libMonoPosixHelper.dylib -output tmp-lib/libMonoPosixHelper.dylib
             # Somehow only included in x86_64 build.
             cp tmp-lib/x86_64/libmono-btls-shared.dylib tmp-lib/
