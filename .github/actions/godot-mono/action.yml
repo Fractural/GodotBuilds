@@ -23,6 +23,7 @@ runs:
   using: "composite"
   steps:
     - name: Setup default inputs
+      shell: bash
       run: |
         echo "INPUT_MONO_BUILD_REPO=${{ inputs.mono-build-repo != '' && inputs.mono-build-repo || env.GODOT_MONO_BUILD_REPO }}" >> $GITHUB_ENV
         echo "INPUT_MONO_BUILD_TAG=${{ inputs.mono-build-tag != '' && inputs.mono-build-tag || env.GODOT_MONO_BUILD_TAG }}" >> $GITHUB_ENV
