@@ -137,6 +137,7 @@ jobs:
         run: |
           echo $(basename bin/*)
 
+          mkdir -p $HOME/out/templates
           cp bin/libgodot.iphone.opt.arm64.a $HOME/out/templates/libgodot.iphone.a
           cp bin/libgodot.iphone.opt.debug.arm64.a $HOME/out/templates/libgodot.iphone.debug.a
 
@@ -1198,7 +1199,7 @@ jobs:
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
         run: |
-          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/desktop-win32-bcl/net_4_x-win32" >> $GITHUB_ENV
+          echo "MONO_SCONSFLAGS=module_mono_enabled=yes mono_glue=yes copy_mono_root=yes mono_bcl=$HOME/mono-bcls/desktop-win32-bcl/net_4_x-win32 mono_static=yes" >> $GITHUB_ENV
       
       - name: Clear bin
         run: |
@@ -1455,6 +1456,10 @@ jobs:
           # endregion
 
           # region Javascript
+          if ${{ matrix.build-mono }}; then
+              mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
+              cp -r javascript-mono-templates/bcl/wasm ${{ env.TEMPLATES_DIR }}/bcl/
+          fi
           cp javascript-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.javascript.opt${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_release.zip
           cp javascript-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.javascript.opt.debug${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_debug.zip
           # TODO: Create threads and gdnative
@@ -1476,12 +1481,17 @@ jobs:
           # endregion
 
           # region iOS
+          if ${{ matrix.build-mono }}; then
+            mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
+            cp -r ios-mono-templates/bcl/monotouch* ${{ env.TEMPLATES_DIR }}/bcl/
+            cp -r ios-mono-templates/iphone-mono-libs ${{ env.TEMPLATES_DIR }}
+          fi
           rm -rf ios_xcode
           cp -r misc/dist/ios_xcode ios_xcode
-          cp out/ios/templates/libgodot.iphone.simulator.a ios_xcode/libgodot.iphone.release.xcframework/ios-arm64_x86_64-simulator/libgodot.a
-          cp out/ios/templates/libgodot.iphone.debug.simulator.a ios_xcode/libgodot.iphone.debug.xcframework/ios-arm64_x86_64-simulator/libgodot.a
-          cp out/ios/templates/libgodot.iphone.a ios_xcode/libgodot.iphone.release.xcframework/ios-arm64/libgodot.a
-          cp out/ios/templates/libgodot.iphone.debug.a ios_xcode/libgodot.iphone.debug.xcframework/ios-arm64/libgodot.a
+          cp ios-${{ matrix.build-mono && 'mono-' || '' }}templates/libgodot.iphone.simulator.a ios_xcode/libgodot.iphone.release.xcframework/ios-arm64_x86_64-simulator/libgodot.a
+          cp ios-${{ matrix.build-mono && 'mono-' || '' }}templates/libgodot.iphone.debug.simulator.a ios_xcode/libgodot.iphone.debug.xcframework/ios-arm64_x86_64-simulator/libgodot.a
+          cp ios-${{ matrix.build-mono && 'mono-' || '' }}templates/libgodot.iphone.a ios_xcode/libgodot.iphone.release.xcframework/ios-arm64/libgodot.a
+          cp ios-${{ matrix.build-mono && 'mono-' || '' }}templates/libgodot.iphone.debug.a ios_xcode/libgodot.iphone.debug.xcframework/ios-arm64/libgodot.a
           cd ios_xcode
           zip -q -9 -r "${{ env.TEMPLATES_DIR }}/iphone.zip" *
           cd ..
@@ -1489,7 +1499,7 @@ jobs:
           # endregion
 
           # region Templates TPZ (Classical)
-          echo "${TEMPLATES_VERSION}" > ${{ env.TEMPLATES_DIR }}/version.txt
+          echo "${{ env.TEMPLATES_VERSION }}" > ${{ env.TEMPLATES_DIR }}/version.txt
           pushd ${{ env.TEMPLATES_DIR }}/..
           zip -q -9 -r -D "${{ env.RELDIR }}/${{ env.GODOT_BASENAME }}_export_templates.tpz" templates/*
           popd
