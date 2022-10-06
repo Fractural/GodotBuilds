@@ -804,6 +804,7 @@ jobs:
           # build so that we rely on its config, which has libmono-native.dylib instead of
           # libmono-native-compat.dylib).
           mkdir -p tmp-lib/{x86_64,arm64}
+          find bin | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"
           cp bin/GodotSharp/Mono/lib/*.dylib tmp-lib/x86_64/
 
       - name: Compilation (arch=arm64)
@@ -817,7 +818,10 @@ jobs:
       - name: Dylib Wrangling
         if: ${{ matrix.build-mono }}
         run: |
+          find bin | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"
           cp bin/GodotSharp/Mono/lib/*.dylib tmp-lib/arm64/
+          echo "tmp-lib:"
+          find tmp-lib | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"
 
       - name: Package Editor (arch=arm64, x86_64)
         run: |
