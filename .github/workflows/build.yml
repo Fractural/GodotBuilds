@@ -19,8 +19,8 @@ env:
   GODOT_MONO_BUILD_TAG: release-0f99f4b # mono-6.12.0.182
   GODOT_MONO_BUILD_REPO: fractural/godot-mono-builds
   # Linux builds require an older release of mono for some reason
-  # GODOT_MONO_LINUX_BUILD_TAG: release-aa9e050 # mono-6.12.0.144
-  # GODOT_MONO_LINUX_BUILD_REPO: godotengine/godot-mono-builds
+  GODOT_MONO_LINUX_BUILD_TAG: release-aa9e050 # mono-6.12.0.144
+  GODOT_MONO_LINUX_BUILD_REPO: godotengine/godot-mono-builds
   GODOT_BASE_VERSION: 3.5
   GODOT_BASE_VERSION_STATUS: stable
   GODOT_VERSION_STATUS: custom
@@ -563,6 +563,8 @@ jobs:
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
+          mono-build-repo: ${{ env.GODOT_MONO_LINUX_BUILD_REPO }}
+          mono-build-tag: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
           mono-release: "linux-x86_64"
           mono-bcl: "bcl-desktop"
       
@@ -570,6 +572,8 @@ jobs:
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
+          mono-build-repo: ${{ env.GODOT_MONO_LINUX_BUILD_REPO }}
+          mono-build-tag: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
           mono-release: "linux-x86"
       
       - name: Mono precompilation
@@ -1434,8 +1438,8 @@ jobs:
           rm -rf osx_template.app
           cp -r misc/dist/osx_template.app .
           mkdir -p osx_template.app/Contents/MacOS
-          cp macos-templates/godot.osx.opt.universal${{ matrix.build-mono && '.mono' || '' }} osx_template.app/Contents/MacOS/godot_osx_release.64
-          cp macos-templates/godot.osx.opt.debug.universal${{ matrix.build-mono && '.mono' || '' }} osx_template.app/Contents/MacOS/godot_osx_debug.64
+          cp macos-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.osx.opt.universal${{ matrix.build-mono && '.mono' || '' }} osx_template.app/Contents/MacOS/godot_osx_release.64
+          cp macos-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.osx.opt.debug.universal${{ matrix.build-mono && '.mono' || '' }} osx_template.app/Contents/MacOS/godot_osx_debug.64
           if ${{ matrix.build-mono }}; then
             cp -rp macos-mono-templates/data.mono.osx.64.* osx_template.app/Contents/Resources/
           fi
@@ -1447,17 +1451,24 @@ jobs:
           # endregion
 
           # region Javascript
-          cp javascript-templates/godot.javascript.opt.zip ${{ env.TEMPLATES_DIR }}/webassembly_release.zip
-          cp javascript-templates/godot.javascript.opt.debug.zip ${{ env.TEMPLATES_DIR }}/webassembly_debug.zip
+          cp javascript-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.javascript.opt${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_release.zip
+          cp javascript-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.javascript.opt.debug${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_debug.zip
           # TODO: Create threads and gdnative
-          # cp javascript-templates/godot.javascript.opt.threads.zip ${{ env.TEMPLATES_DIR }}/webassembly_threads_release.zip
-          # cp javascript-templates/godot.javascript.opt.debug.threads.zip ${{ env.TEMPLATES_DIR }}/webassembly_threads_debug.zip
-          # cp javascript-templates/godot.javascript.opt.gdnative.zip ${{ env.TEMPLATES_DIR }}/webassembly_gdnative_release.zip
-          # cp javascript-templates/godot.javascript.opt.debug.gdnative.zip ${{ env.TEMPLATES_DIR }}/webassembly_gdnative_debug.zip
+          # cp javascript-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.javascript.opt.threads${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_threads_release.zip
+          # cp javascript-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.javascript.opt.debug.threads${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_threads_debug.zip
+          # cp javascript-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.javascript.opt.gdnative${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_gdnative_release.zip
+          # cp javascript-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.javascript.opt.debug.gdnative${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_gdnative_debug.zip
           # endregion
 
           # region Android
-          cp out/android/templates/godot-lib.release.aar ${{ env.RELDIR }}/godot-lib.${TEMPLATES_VERSION}.release.aar
+          if ${{ matrix.build-mono }}; then
+            mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
+            cp -r android-mono-templates/bcl/godot_android_ext ${templatesdir_mono}/bcl/
+            cp -r android-mono-templates/bcl/monodroid ${templatesdir_mono}/bcl/
+          fi
+          cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/godot-lib.release.aar ${{ env.RELDIR }}/godot-lib.${{ env.TEMPLATES_VERSION }}${{ matrix.build-mono && '.mono' || '' }}.release.aar
+          cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/*.apk ${{ env.TEMPLATES_VERSION }}/
+          cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/android_source.zip ${{ env.TEMPLATES_VERSION }}/
           # endregion
 
           # region iOS
