@@ -18,7 +18,7 @@ inputs:
     default: ""
   mono-build-tag:
     description: Release tag to download from the mono-build-repo
-    default: "$GODOT_MONO_BUILD_TAG"  
+    default: ""  
 runs:
   using: "composite"
   steps:
