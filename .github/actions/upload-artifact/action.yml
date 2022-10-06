@@ -18,8 +18,11 @@ runs:
       if: ${{ inputs.compress }}
       shell: bash
       run: |
-        zip -ry ${{ inputs.name }}.zip ${{ inputs.path }}
-    
+        original_path=$(pwd)
+        pushd ${{ inputs.path }}
+        zip -ry ${original_path}/${{ inputs.name }}.zip *
+        popd
+      
     - name: Upload Godot Artifact
       uses: actions/upload-artifact@v3
       with:
