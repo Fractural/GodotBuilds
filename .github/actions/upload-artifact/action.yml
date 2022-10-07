@@ -14,18 +14,9 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Compress Artifact
-      if: ${{ inputs.compress }}
-      shell: bash
-      run: |
-        original_path=$(pwd)
-        pushd ${{ inputs.path }}
-        zip -ry ${original_path}/${{ inputs.name }}.zip *
-        popd
-      
     - name: Upload Godot Artifact
       uses: actions/upload-artifact@v3
       with:
         name: ${{ inputs.name }}
-        path: ${{ inputs.name }}.zip
+        path: ${{ inputs.path }}
         retention-days: 14
