@@ -1413,11 +1413,11 @@ jobs:
 
       - name: Setup ENV Vars
         run: |
-          echo "GODOT_VERSION=${{ format('{0}-{0}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}" >> $GITHUB_ENV
-          echo "TEMPLATES_VERSION=${{ format('{0}-{0}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}" >> $GITHUB_ENV
+          echo "GODOT_VERSION=${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}" >> $GITHUB_ENV
+          echo "TEMPLATES_VERSION=${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}" >> $GITHUB_ENV
 
           echo "RELDIR="$HOME/releases/" >> $GITHUB_ENV
-          echo "GODOT_BASENAME="Godot_v${{ format('{0}-{0}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}" >> $GITHUB_ENV
+          echo "GODOT_BASENAME="Godot_v${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}" >> $GITHUB_ENV
           echo "TEMPLATES_DIR="$HOME/templates" >> $GITHUB_ENV
 
       - name: Bundle Templates
