@@ -174,7 +174,7 @@ jobs:
         uses: ./.github/actions/upload-artifact
         with:
           path: $HOME/out/templates
-          name: ${{ matrix.cache-name }}
+          name: ${{ matrix.cache-name }}-templates
       # endregion
   
   android:
