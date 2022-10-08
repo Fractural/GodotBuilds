@@ -170,6 +170,9 @@ jobs:
             cp -r $HOME/mono-bcls/ios-bcl/* $HOME/out/templates/bcl
           fi
 
+          echo "$HOME/out/templates files:"
+          echo $(basename $HOME/out/templates/*)
+
       - name: Upload Templates
         uses: ./.github/actions/upload-artifact
         with:
@@ -431,7 +434,7 @@ jobs:
         continue-on-error: true
         with:
           version: ${{ env.EM_VERSION }}
-          actions-cache-folder: ${{ env.EM_CACHE_FOLDER }}
+          actions-cache-folder: ${{ matrix.cache-name }}-${{ env.EM_CACHE_FOLDER }}
 
       - name: Verify Emscripten setup
         run: |
