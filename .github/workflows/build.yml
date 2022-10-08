@@ -176,7 +176,7 @@ jobs:
       - name: Upload Templates
         uses: ./.github/actions/upload-artifact
         with:
-          path: $HOME/out/templates
+          path: ~/out/templates
           name: ${{ matrix.cache-name }}-templates
       # endregion
   
@@ -383,7 +383,7 @@ jobs:
       - name: Upload Templates
         uses: ./.github/actions/upload-artifact
         with:
-          path: $HOME/out/templates
+          path: ~/out/templates
           name: ${{ matrix.cache-name }}-templates
       # endregion
   
@@ -513,7 +513,7 @@ jobs:
       - name: Upload Templates
         uses: ./.github/actions/upload-artifact
         with:
-          path: $HOME/out/templates
+          path: ~/out/templates
           name: ${{ matrix.cache-name }}-templates
       # endregion
   
