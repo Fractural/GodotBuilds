@@ -1347,49 +1347,49 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: linux-${{ matrix.build-mono && 'mono-' || '' }}templates-64
-          path: ./
+          path: linux-${{ matrix.build-mono && 'mono-' || '' }}templates-64
       
       - name: Download Linux Templates (bits=32)
         uses: actions/download-artifact@v3
         with:
           name: linux-${{ matrix.build-mono && 'mono-' || '' }}templates-32
-          path: ./
+          path: linux-${{ matrix.build-mono && 'mono-' || '' }}templates-32
       
       - name: Download Windows Templates (bits=64)
         uses: actions/download-artifact@v3
         with:
           name: windows-${{ matrix.build-mono && 'mono-' || '' }}templates-64
-          path: ./
+          path: windows-${{ matrix.build-mono && 'mono-' || '' }}templates-64
       
       - name: Download Windows Templates (bits=32)
         uses: actions/download-artifact@v3
         with:
           name: windows-${{ matrix.build-mono && 'mono-' || '' }}templates-32
-          path: ./
+          path: windows-${{ matrix.build-mono && 'mono-' || '' }}templates-32
       
       - name: Download MacOS Templates
         uses: actions/download-artifact@v3
         with:
           name: macos-${{ matrix.build-mono && 'mono-' || '' }}templates
-          path: ./
+          path: macos-${{ matrix.build-mono && 'mono-' || '' }}templates
       
       - name: Download Android Templates
         uses: actions/download-artifact@v3
         with:
           name: android-${{ matrix.build-mono && 'mono-' || '' }}templates
-          path: ./
+          path: android-${{ matrix.build-mono && 'mono-' || '' }}templates
       
       - name: Download Javascript Templates
         uses: actions/download-artifact@v3
         with:
           name: javascript-${{ matrix.build-mono && 'mono-' || '' }}templates
-          path: ./
+          path: javascript-${{ matrix.build-mono && 'mono-' || '' }}templates
 
       - name: Download iOS Templates
         uses: actions/download-artifact@v3
         with:
           name: ios-${{ matrix.build-mono && 'mono-' || '' }}templates
-          path: ./
+          path: ios-${{ matrix.build-mono && 'mono-' || '' }}templates
       # endregion
       
       # region    Download Mono Editors
@@ -1399,19 +1399,19 @@ jobs:
         if: ${{ matrix.build-mono }}
         with:
           name: linux-mono-editor-64
-          path: ./
+          path: linux-mono-editor-64
       
       - name: Download Windows Mono Editor (bits=64)
         uses: actions/download-artifact@v3
         if: ${{ matrix.build-mono }}
         with:
           name: windows-mono-editor-64
-          path: ./
+          path: windows-mono-editor-64
       # endregion
 
-      - name: Unzip Templates
+      - name: Debug Print
         run: |
-          find . -iname "*templates*.zip" -exec unzip -v {} \;
+          ls -a
       # endregion
 
       - name: Setup ENV Vars
