@@ -1411,7 +1411,7 @@ jobs:
 
       - name: Unzip Templates
         run: |
-          find . -iname "*-templates.zip" -exec unzip {} \;
+          find . -iname "*templates*.zip" -exec unzip -v {} \;
       # endregion
 
       - name: Setup ENV Vars
@@ -1507,6 +1507,7 @@ jobs:
           cp ios-${{ matrix.build-mono && 'mono-' || '' }}templates/libgodot.iphone.a ios_xcode/libgodot.iphone.release.xcframework/ios-arm64/libgodot.a
           cp ios-${{ matrix.build-mono && 'mono-' || '' }}templates/libgodot.iphone.debug.a ios_xcode/libgodot.iphone.debug.xcframework/ios-arm64/libgodot.a
           cd ios_xcode
+          
           zip -q -9 -r "${{ env.TEMPLATES_DIR }}/iphone.zip" *
           cd ..
           rm -rf ios_xcode
