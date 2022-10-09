@@ -759,14 +759,15 @@ jobs:
       # endregion
 
       # region Mono Setup
-      - name: Setup mono
+      - name: Setup mono (x86_64)
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
           mono-release: "osx-x86_64"
           mono-bcl: "bcl-desktop"
       
-      - if: ${{ matrix.build-mono }}
+      - name: Setup mono (arm64)
+        if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
           mono-release: "osx-arm64"
@@ -1425,6 +1426,9 @@ jobs:
 
       - name: Bundle Templates
         run: |
+          mkdir -p ${{ env.TEMPLATES_DIR }}
+          mkdir -p ${{ env.RELDIR }}
+
           # region Linux
           if ${{ matrix.build-mono }}; then
             cp -rp linux-mono-templates-64/data.mono.x11.64.* ${{ env.TEMPLATES_DIR }}/
