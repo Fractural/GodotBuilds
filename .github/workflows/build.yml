@@ -528,11 +528,11 @@ jobs:
       matrix:
         include:
           - name: Editor & Templates
-            cache-name: linux-0
+            cache-name: linux
             build-mono: false
 
           - name: Editor & Templates w/ Mono
-            cache-name: linux-mono-0
+            cache-name: linux-mono
             build-mono: true
 
     steps:
