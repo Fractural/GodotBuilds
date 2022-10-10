@@ -1602,11 +1602,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: ${{ matrix.artifact_name }}
-          path: ./
-      
-      - name: Unzip
-        run: |
-          unzip ${{ matrix.artifact_name }}.zip
+          path: ./${{ matrix.artifact_name }}
       
       - name: Debug
         shell: bash

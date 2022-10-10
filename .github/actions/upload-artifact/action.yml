@@ -8,9 +8,6 @@ inputs:
     description: The path to upload.
     required: true
     default: "bin"
-  compress:
-    description: Whether to compress the artifact or not
-    default: true
 runs:
   using: "composite"
   steps:
