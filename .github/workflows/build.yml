@@ -533,7 +533,6 @@ jobs:
 
           - name: Editor & Templates w/ Mono
             cache-name: linux-mono
-            sconsflags: mono_static=yes
             build-mono: true
 
     steps:
@@ -1421,16 +1420,17 @@ jobs:
           echo "GODOT_VERSION=${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}" >> $GITHUB_ENV
           echo "TEMPLATES_VERSION=${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}" >> $GITHUB_ENV
 
-          echo "RELDIR=\"$HOME/releases/\"" >> $GITHUB_ENV
-          echo "GODOT_BASENAME=\"Godot_v${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}\"" >> $GITHUB_ENV
-          echo "TEMPLATES_DIR=\"$HOME/templates\"" >> $GITHUB_ENV
+          echo "RELDIR=$HOME/releases" >> $GITHUB_ENV
+          echo "GODOT_BASENAME=Godot_v${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}" >> $GITHUB_ENV
+          echo "TEMPLATES_DIR=$HOME/templates" >> $GITHUB_ENV
 
-      - name: Bundle Templates
+      - name: Setup Directories
         run: |
           mkdir -p ${{ env.TEMPLATES_DIR }}
           mkdir -p ${{ env.RELDIR }}
 
-          # region Linux
+      - name: Bundle Linux
+        run: |
           if ${{ matrix.build-mono }}; then
             cp -rp linux-mono-templates-64/data.mono.x11.64.* ${{ env.TEMPLATES_DIR }}/
             cp -rp linux-mono-templates-32/data.mono.x11.32.* ${{ env.TEMPLATES_DIR }}/
@@ -1442,23 +1442,23 @@ jobs:
           cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.x11.opt.32${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_32_release
           cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.x11.opt.debug.32${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_32_debug
           strip ${{ env.TEMPLATES_DIR }}/linux_x11_*
-          # endregion
 
-          # region Windows
+      - name: Bundle Windows
+        run: |
           if ${{ matrix.build-mono }}; then
             cp -rp windows-mono-templates-64/data.mono.windows.64.* ${{ env.TEMPLATES_DIR }}/
             cp -rp windows-mono-templates-32/data.mono.windows.32.* ${{ env.TEMPLATES_DIR }}/
             mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
-            cp -r windows-mono-editor/GodotSharp/Mono/lib/mono/4.5/ ${TEMPLATES_DIR_mono}/bcl/net_4_x_win
+            cp -r windows-mono-editor-64/GodotSharp/Mono/lib/mono/4.5/ ${TEMPLATES_DIR_mono}/bcl/net_4_x_win
           fi
           cp windows-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.windows.opt.64${{ matrix.build-mono && '.mono' || '' }}.exe ${{ env.TEMPLATES_DIR }}/windows_64_release.exe
           cp windows-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.windows.opt.debug.64${{ matrix.build-mono && '.mono' || '' }}.exe ${{ env.TEMPLATES_DIR }}/windows_64_debug.exe
           cp windows-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.windows.opt.32${{ matrix.build-mono && '.mono' || '' }}.exe ${{ env.TEMPLATES_DIR }}/windows_32_release.exe
           cp windows-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.windows.opt.debug.32${{ matrix.build-mono && '.mono' || '' }}.exe ${{ env.TEMPLATES_DIR }}/windows_32_debug.exe
           strip ${{ env.TEMPLATES_DIR }}/windows*.exe
-          # endregion
 
-          # region MacOS
+      - name: Bundle MacOS
+        run: |
           rm -rf osx_template.app
           cp -r misc/dist/osx_template.app .
           mkdir -p osx_template.app/Contents/MacOS
@@ -1472,9 +1472,9 @@ jobs:
           rm -rf osx_template.app
           # TODO: Create MacOS signing
           # sign_macos_template ${{ env.TEMPLATES_DIR }} 0
-          # endregion
 
-          # region Javascript
+      - name: Bundle Javascript
+        run: |
           if ${{ matrix.build-mono }}; then
               mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
               cp -r javascript-mono-templates/bcl/wasm ${{ env.TEMPLATES_DIR }}/bcl/
@@ -1486,9 +1486,9 @@ jobs:
           # cp javascript-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.javascript.opt.debug.threads${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_threads_debug.zip
           # cp javascript-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.javascript.opt.gdnative${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_gdnative_release.zip
           # cp javascript-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.javascript.opt.debug.gdnative${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_gdnative_debug.zip
-          # endregion
 
-          # region Android
+      - name: Bundle Android
+        run: |
           if ${{ matrix.build-mono }}; then
             mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
             cp -r android-mono-templates/bcl/godot_android_ext ${templatesdir_mono}/bcl/
@@ -1497,9 +1497,9 @@ jobs:
           cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/godot-lib.release.aar ${{ env.RELDIR }}/godot-lib.${{ env.TEMPLATES_VERSION }}${{ matrix.build-mono && '.mono' || '' }}.release.aar
           cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/*.apk ${{ env.TEMPLATES_VERSION }}/
           cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/android_source.zip ${{ env.TEMPLATES_VERSION }}/
-          # endregion
 
-          # region iOS
+      - name: Bundle iOS
+        run: |
           if ${{ matrix.build-mono }}; then
             mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
             cp -r ios-mono-templates/bcl/monotouch* ${{ env.TEMPLATES_DIR }}/bcl/
@@ -1516,14 +1516,13 @@ jobs:
           zip -q -9 -r "${{ env.TEMPLATES_DIR }}/iphone.zip" *
           cd ..
           rm -rf ios_xcode
-          # endregion
 
-          # region Templates TPZ (Classical)
+      - name: Create Templates TPZ
+        run: |
           echo "${{ env.TEMPLATES_VERSION }}" > ${{ env.TEMPLATES_DIR }}/version.txt
           pushd ${{ env.TEMPLATES_DIR }}/..
           zip -q -9 -r -D "${{ env.RELDIR }}/${{ env.GODOT_BASENAME }}_export_templates.tpz" templates/*
           popd
-          # endregion
 
       - name: Upload Android Template
         uses: ./github/actions/upload-artifact
