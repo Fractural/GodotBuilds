@@ -1491,12 +1491,12 @@ jobs:
         run: |
           if ${{ matrix.build-mono }}; then
             mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
-            cp -r android-mono-templates/bcl/godot_android_ext ${templatesdir_mono}/bcl/
-            cp -r android-mono-templates/bcl/monodroid ${templatesdir_mono}/bcl/
+            cp -r android-mono-templates/bcl/godot_android_ext ${{ env.TEMPLATES_DIR }}/bcl/
+            cp -r android-mono-templates/bcl/monodroid ${{ env.TEMPLATES_DIR }}/bcl/
           fi
           cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/godot-lib.release.aar ${{ env.RELDIR }}/godot-lib.${{ env.TEMPLATES_VERSION }}${{ matrix.build-mono && '.mono' || '' }}.release.aar
-          cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/*.apk ${{ env.TEMPLATES_VERSION }}/
-          cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/android_source.zip ${{ env.TEMPLATES_VERSION }}/
+          cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/*.apk ${{ env.TEMPLATES_DIR }}/
+          cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/android_source.zip ${{ env.TEMPLATES_DIR }}/
 
       - name: Bundle iOS
         run: |
