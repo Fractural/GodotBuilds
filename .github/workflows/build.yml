@@ -31,7 +31,7 @@ jobs:
     runs-on: "macos-latest"
     name: 🍏 iOS ${{ matrix.name }}
     env:
-      SCONSFLAGS: verbose=yes warnings=all
+      SCONSFLAGS: 
     strategy:
       fail-fast: false
       matrix:
@@ -185,7 +185,7 @@ jobs:
     runs-on: "ubuntu-latest"
     name: 🤖 Android ${{ matrix.name }}
     env:
-      SCONSFLAGS: verbose=yes warnings=all
+      SCONSFLAGS: 
     strategy:
       fail-fast: false
       matrix:
@@ -392,7 +392,7 @@ jobs:
     runs-on: "ubuntu-latest"
     name: 🌐 JavaScript ${{ matrix.name }}
     env:
-      SCONSFLAGS: verbose=yes warnings=all mono_static=yes
+      SCONSFLAGS: mono_static=yes
       EM_VERSION: 1.39.9
       EM_CACHE_FOLDER: "emsdk-cache"
     strategy:
@@ -522,7 +522,7 @@ jobs:
     runs-on: "ubuntu-latest"
     name: 🐧 Linux ${{ matrix.name }}
     env:
-      SCONSFLAGS: verbose=yes warnings=all mono_static=yes
+      SCONSFLAGS: mono_static=yes
     strategy:
       fail-fast: false
       matrix:
@@ -725,7 +725,7 @@ jobs:
     runs-on: "macos-latest"
     name: 🍎 macOS ${{ matrix.name }}
     env:
-      SCONSFLAGS: verbose=yes warnings=all
+      SCONSFLAGS: 
       STRIP: "strip -u -r"
     strategy:
       fail-fast: false
@@ -917,7 +917,7 @@ jobs:
     runs-on: "ubuntu-latest"
     name: ☁ Server ${{ matrix.name }}
     env:
-      SCONSFLAGS: verbose=yes warnings=all
+      SCONSFLAGS: 
     strategy:
       fail-fast: false
       matrix:
@@ -1121,7 +1121,7 @@ jobs:
     runs-on: "ubuntu-latest"
     name: 🏁 Windows ${{ matrix.name }}
     env:
-      SCONSFLAGS: verbose=yes warnings=all use_mingw=yes
+      SCONSFLAGS: use_mingw=yes
     strategy:
       fail-fast: false
       matrix:
@@ -1251,7 +1251,7 @@ jobs:
           target: release_debug
           tools: true
       
-      - name: Upload Editor
+      - name: Upload Templates
         uses: ./.github/actions/upload-artifact
         with:
           name: ${{ matrix.cache-name }}-editor-32
