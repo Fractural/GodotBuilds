@@ -14,16 +14,12 @@ on:
 # Global Settings
 # SCONS_CACHE for windows must be set in the build environment
 env:
-  # Only used for the cache key. Increment version to force clean build.
-  GODOT_BASE_BRANCH: 3.x
-  GODOT_MONO_BUILD_TAG: release-5299efd # release-0f99f4b # mono-6.12.0.182
-  GODOT_MONO_BUILD_REPO: godotengine/godot-mono-builds # fractural/godot-mono-builds
-  # Linux builds require an older release of mono for some reason
-  GODOT_MONO_LINUX_BUILD_TAG: release-5299efd # release-aa9e050 # mono-6.12.0.144
-  GODOT_MONO_LINUX_BUILD_REPO: godotengine/godot-mono-builds
+  # Used for cache key as well as for downloading the correct Godot version.
   GODOT_BASE_VERSION: 3.5
   GODOT_BASE_VERSION_STATUS: stable
   GODOT_VERSION_STATUS: custom
+  GODOT_MONO_BUILD_TAG: release-5299efd # mono-6.12.0.182
+  GODOT_MONO_BUILD_REPO: godotengine/godot-mono-builds
 
 jobs:
   ios:
@@ -576,8 +572,6 @@ jobs:
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
-          mono-build-repo: ${{ env.GODOT_MONO_LINUX_BUILD_REPO }}
-          mono-build-tag: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
           mono-release: "linux-x86_64"
           mono-bcl: "bcl-desktop"
       
@@ -585,8 +579,6 @@ jobs:
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
-          mono-build-repo: ${{ env.GODOT_MONO_LINUX_BUILD_REPO }}
-          mono-build-tag: ${{ env.GODOT_MONO_LINUX_BUILD_TAG }}
           mono-release: "linux-x86"
       
       - name: Mono precompilation
