@@ -1569,7 +1569,7 @@ jobs:
         artifact_name: [
           # Regular builds
           linux-editor-64, linux-editor-32, linux-templates-64, linux-templates-32,
-          server-editor-64, server-editor-32 server-templates-64, server-templates-32,
+          server-editor-64, server-editor-32, server-templates-64, server-templates-32,
           windows-editor-64, windows-editor-32, windows-templates-64, windows-templates-32,
           macos-editor, macos-templates,
           android-templates,
@@ -1580,7 +1580,7 @@ jobs:
 
           # Mono builds
           linux-mono-editor-64, linux-mono-editor-32, linux-mono-templates-64, linux-mono-templates-32,
-          server-mono-editor-64, server-mono-editor-32 server-mono-templates-64, server-mono-templates-32,
+          server-mono-editor-64, server-mono-editor-32, server-mono-templates-64, server-mono-templates-32,
           windows-mono-editor-64, windows-mono-editor-32, windows-mono-templates-64, windows-mono-templates-32,
           macos-mono-editor, macos-mono-templates,
           android-mono-templates,
