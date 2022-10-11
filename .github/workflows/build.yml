@@ -1568,9 +1568,9 @@ jobs:
       matrix:
         artifact_name: [
           # Regular builds
-          linux-editor-64, linux-editor-32, linux-templates,
-          server-editor-64, server-editor-32 server-templates,
-          windows-editor-64, windows-editor-32, windows-templates,
+          linux-editor-64, linux-editor-32, linux-templates-64, linux-templates-32,
+          server-editor-64, server-editor-32 server-templates-64, server-templates-32,
+          windows-editor-64, windows-editor-32, windows-templates-64, windows-templates-32,
           macos-editor, macos-templates,
           android-templates,
           javascript-templates,
@@ -1579,9 +1579,9 @@ jobs:
           export-templates,
 
           # Mono builds
-          linux-mono-editor-64, linux-mono-editor-32, linux-mono-templates,
-          server-mono-editor-64, server-mono-editor-32 server-mono-templates,
-          windows-mono-editor-64, windows-mono-editor-32, windows-mono-templates,
+          linux-mono-editor-64, linux-mono-editor-32, linux-mono-templates-64, linux-mono-templates-32,
+          server-mono-editor-64, server-mono-editor-32 server-mono-templates-64, server-mono-templates-32,
+          windows-mono-editor-64, windows-mono-editor-32, windows-mono-templates-64, windows-mono-templates-32,
           macos-mono-editor, macos-mono-templates,
           android-mono-templates,
           javascript-mono-templates,
@@ -1607,6 +1607,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.release_upload_url }}
-          asset_path: ./${{ matrix.artifact_name }}
+          asset_path: ./
           asset_name: ${{ matrix.artifact_name }}
           asset_content_type: application/zip
