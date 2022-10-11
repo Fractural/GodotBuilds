@@ -1598,7 +1598,10 @@ jobs:
       
       - name: Zip Artifact
         run: |
-          zip ${{ matrix.artifact_name }}
+          original_path=$(pwd)
+          pushd ${{ matrix.artifact_name }}
+          zip -ry ${original_path}/${{ matrix.artifact_name }}.zip *
+          popd
 
       - name: Debug
         shell: bash
