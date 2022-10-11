@@ -1615,5 +1615,5 @@ jobs:
         with:
           upload_url: ${{ needs.create-release.outputs.release_upload_url }}
           asset_path: ./
-          asset_name: ${{ matrix.artifact_name }}
+          asset_name: ${{ matrix.artifact_name }}.zip
           asset_content_type: application/zip
