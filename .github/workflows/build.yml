@@ -1519,7 +1519,7 @@ jobs:
       - name: Upload Android Template
         uses: ./.github/actions/upload-artifact
         with:
-          path: ${{ env.RELDIR }}/godot-lib.${{ env.TEMPLATES_VERSION }}.release.aar
+          path: ${{ env.RELDIR }}/godot-lib.${{ env.TEMPLATES_VERSION }}${{ matrix.build-mono && '.mono' || '' }}.release.aar
           name: android-library${{ matrix.build-mono && '-mono' || '' }}
       
       - name: Upload Export Templates TPZ
