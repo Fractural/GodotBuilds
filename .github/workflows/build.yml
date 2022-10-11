@@ -1568,26 +1568,26 @@ jobs:
       matrix:
         artifact_name: [
           # Regular builds
-          linux-editor, linux-templates,
-          server-editor, server-templates,
-          windows-editor, windows-templates,
+          linux-editor-64, linux-editor-32, linux-templates,
+          server-editor-64, server-editor-32 server-templates,
+          windows-editor-64, windows-editor-32, windows-templates,
           macos-editor, macos-templates,
           android-templates,
           javascript-templates,
           ios-templates,
           android-library,
-          export_templates,
+          export-templates,
 
           # Mono builds
-          linux-mono-editor-mono, linux-mono-templates-mono,
-          server-mono-editor-mono, server-mono-templates-mono,
-          windows-mono-editor, windows-mono-templates, 
+          linux-mono-editor-64, linux-mono-editor-32, linux-mono-templates,
+          server-mono-editor-64, server-mono-editor-32 server-mono-templates,
+          windows-mono-editor-64, windows-mono-editor-32, windows-mono-templates,
           macos-mono-editor, macos-mono-templates,
           android-mono-templates,
           javascript-mono-templates,
           ios-mono-templates,
           android-library-mono,
-          export_templates-mono
+          export-templates-mono
         ]
     steps:
       - name: Download Artifact
