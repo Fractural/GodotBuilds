@@ -1596,6 +1596,10 @@ jobs:
           name: ${{ matrix.artifact_name }}
           path: ./${{ matrix.artifact_name }}
       
+      - name: Zip Artifact
+        run: |
+          zip ${{ matrix.artifact_name }}
+
       - name: Debug
         shell: bash
         run: ls
@@ -1607,6 +1611,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.release_upload_url }}
-          asset_path: ./
+          asset_path: ${{ matrix.artifact_name }}
           asset_name: ${{ matrix.artifact_name }}
           asset_content_type: application/zip
