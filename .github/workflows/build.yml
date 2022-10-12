@@ -1533,6 +1533,7 @@ jobs:
   create-release:
     if: success() && (
         (github.event_name == 'push') ||
+        (github.event_name == 'schedule') ||
         (github.event_name == 'workflow_dispatch' && inputs.make-release)
       )
     needs: [ios, android, javascript, linux, macos, server, windows, bundle-export-templates]
@@ -1561,6 +1562,7 @@ jobs:
   upload-release-artifacts: 
     if: success() && (
         (github.event_name == 'push') ||
+        (github.event_name == 'schedule') ||
         (github.event_name == 'workflow_dispatch' && inputs.make-release)
       )
     needs: create-release
