@@ -1409,8 +1409,7 @@ jobs:
 
       - name: Setup ENV Vars
         run: |
-          echo "GODOT_VERSION=${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}" >> $GITHUB_ENV
-          echo "TEMPLATES_VERSION=${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}" >> $GITHUB_ENV
+          echo "TEMPLATES_VERSION=${{ format('{0}.{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}${{ matrix.build-mono && '.mono' || '' }}" >> $GITHUB_ENV
 
           echo "RELDIR=$HOME/releases" >> $GITHUB_ENV
           echo "GODOT_BASENAME=Godot_v${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}" >> $GITHUB_ENV
@@ -1486,7 +1485,7 @@ jobs:
             cp -r android-mono-templates/bcl/godot_android_ext ${{ env.TEMPLATES_DIR }}/bcl/
             cp -r android-mono-templates/bcl/monodroid ${{ env.TEMPLATES_DIR }}/bcl/
           fi
-          cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/godot-lib.release.aar ${{ env.RELDIR }}/godot-lib.${{ env.TEMPLATES_VERSION }}${{ matrix.build-mono && '.mono' || '' }}.release.aar
+          cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/godot-lib.release.aar ${{ env.RELDIR }}/godot-lib.${{ env.TEMPLATES_VERSION }}.release.aar
           cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/*.apk ${{ env.TEMPLATES_DIR }}/
           cp android-${{ matrix.build-mono && 'mono-' || '' }}templates/android_source.zip ${{ env.TEMPLATES_DIR }}/
 
@@ -1519,7 +1518,7 @@ jobs:
       - name: Upload Android Template
         uses: ./.github/actions/upload-artifact
         with:
-          path: ${{ env.RELDIR }}/godot-lib.${{ env.TEMPLATES_VERSION }}${{ matrix.build-mono && '.mono' || '' }}.release.aar
+          path: ${{ env.RELDIR }}/godot-lib.${{ env.TEMPLATES_VERSION }}.release.aar
           name: android-library${{ matrix.build-mono && '-mono' || '' }}
       
       - name: Upload Export Templates TPZ
