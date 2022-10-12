@@ -1559,6 +1559,46 @@ jobs:
           draft: false
           prerelease: false
   
+  upload-release-export-templates: 
+    if: success() && (
+        (github.event_name == 'push') ||
+        (github.event_name == 'schedule') ||
+        (github.event_name == 'workflow_dispatch' && inputs.make-release)
+      )
+    needs: create-release
+    name: Upload Release Export Templates
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        artifact_name: [
+          # Regular builds
+          export-templates,
+
+          # Mono builds
+          export-templates-mono
+        ]
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ./
+
+      - name: Debug
+        shell: bash
+        run: ls
+      
+      - name: Upload Artifact
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.release_upload_url }}
+          asset_path: ./Godot_v${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}_export_templates.tpz
+          asset_name: ${{ matrix.artifact_name }}.tpz
+          asset_content_type: application/x-tar
+
   upload-release-artifacts: 
     if: success() && (
         (github.event_name == 'push') ||
@@ -1580,7 +1620,6 @@ jobs:
           javascript-templates,
           ios-templates,
           android-library,
-          export-templates,
 
           # Mono builds
           linux-mono-editor-64, linux-mono-editor-32, linux-mono-templates-64, linux-mono-templates-32,
@@ -1590,8 +1629,7 @@ jobs:
           android-mono-templates,
           javascript-mono-templates,
           ios-mono-templates,
-          android-library-mono,
-          export-templates-mono
+          android-library-mono
         ]
     steps:
       - name: Download Artifact
