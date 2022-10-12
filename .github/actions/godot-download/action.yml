@@ -4,9 +4,6 @@ inputs:
   version:
     description: Version of Godot source code to download
     default: "3.5-stable"
-  sg-physics-2d-version:
-    description: Commit hash from SGPhysics2D main branch to checkout
-    default: "a40cdc1cc8bc8a8989ea05f08e877f1ae4de48f0"
 runs:
   using: "composite"
   steps:
