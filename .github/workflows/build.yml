@@ -416,7 +416,7 @@ jobs:
               libspeechd-dev speech-dispatcher
 
       - name: Set up Emscripten latest
-        uses: mymindstorm/setup-emsdk@v11
+        uses: mymindstorm/setup-emsdk@v12
         continue-on-error: true
         with:
           version: ${{ env.EM_VERSION }}
