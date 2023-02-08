@@ -1525,24 +1525,28 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     outputs:
-      release_upload_url: ${{ steps.create_release.outputs.upload_url }}
+      tag: ${{ steps.tag-name.outputs.tag }}
     steps:
       - name: Get current date
         id: date
-        run: echo "::set-output name=date::$(date +'%Y-%m-%d(%H-%M-%S)')"
+        run: echo "date=$(date +'%Y-%m-%d(%H-%M-%S)')" >> $GITHUB_OUTPUT
 
       - name: Short SHA
         id: short-sha
         run: echo "sha7=$(echo ${GITHUB_SHA} | cut -c1-7)" >> $GITHUB_OUTPUT
       
+      - name: Tag Name
+        id: tag-name
+        run: echo "tag=release-${{ steps.short-sha.outputs.sha7 }}-${{ steps.date.outputs.date }}" >> $GITHUB_OUTPUT
+
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: softprops/action-gh-release@v0.1.15
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: release-${{ steps.short-sha.outputs.sha7 }}-${{ steps.date.outputs.date }}
-          release_name: Release ${{ steps.short-sha.outputs.sha7 }} with ${{ env.GODOT_MONO_BUILD_TAG }}
+          tag_name: ${{ steps.tag-name.tag }}
+          name: Release ${{ steps.short-sha.outputs.sha7 }} with ${{ env.GODOT_MONO_BUILD_TAG }}
           body: |
             Godot Mono Build Version: ${{ env.GODOT_MONO_BUILD_TAG }}
           draft: false
@@ -1578,15 +1582,12 @@ jobs:
         run: ls
       
       - name: Upload Artifact
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v0.1.15
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.release_upload_url }}
-          asset_path: ./Godot_v${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}_export_templates.tpz
-          asset_name: ${{ matrix.artifact_name }}.tpz
-          asset_content_type: application/x-tar
+          tag_name: ${{ needs.create-release.outputs.tag }}
+          files: ./Godot_v${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}_export_templates.tpz
 
   upload-release-artifacts: 
     if: success() && (
@@ -1639,12 +1640,9 @@ jobs:
         run: ls
 
       - name: Upload Artifact
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
+        uses: softprops/action-gh-release@v0.1.15
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.create-release.outputs.release_upload_url }}
-          asset_path: ./${{ matrix.artifact_name }}.zip
-          asset_name: ${{ matrix.artifact_name }}.zip
-          asset_content_type: application/zip
+          tag_name: ${{ needs.create-release.outputs.tag }}
+          files: ./${{ matrix.artifact_name }}.zip
