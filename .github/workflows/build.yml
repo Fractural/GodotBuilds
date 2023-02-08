@@ -13,7 +13,6 @@ on:
   push:
     branches:
       - main
-      - fix/_broken-buildsystem
 
 # Global Settings
 # SCONS_CACHE for windows must be set in the build environment
