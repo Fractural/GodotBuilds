@@ -1545,7 +1545,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.tag-name.tag }}
+          tag_name: ${{ steps.tag-name.outputs.tag }}
           name: Release ${{ steps.short-sha.outputs.sha7 }} with ${{ env.GODOT_MONO_BUILD_TAG }}
           body: |
             Godot Mono Build Version: ${{ env.GODOT_MONO_BUILD_TAG }}
