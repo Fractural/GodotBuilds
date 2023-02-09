@@ -1500,7 +1500,7 @@ jobs:
         run: |
           echo "${{ env.TEMPLATES_VERSION }}" > ${{ env.TEMPLATES_DIR }}/version.txt
           pushd ${{ env.TEMPLATES_DIR }}/..
-          zip -q -9 -r -D "${{ env.RELDIR }}/${{ env.GODOT_BASENAME }}_export_templates.tpz" templates/*
+          zip -q -9 -r -D "${{ env.RELDIR }}/${{ env.GODOT_BASENAME }}_export-templates${{ matrix.build-mono && '-mono' || '' }}.tpz" templates/*
           popd
 
       - name: Upload Android Template
@@ -1512,7 +1512,7 @@ jobs:
       - name: Upload Export Templates TPZ
         uses: ./.github/actions/upload-artifact
         with:
-          path: ${{ env.RELDIR }}/${{ env.GODOT_BASENAME }}_export_templates.tpz
+          path: ${{ env.RELDIR }}/${{ env.GODOT_BASENAME }}_export-templates${{ matrix.build-mono && '-mono' || '' }}.tpz
           name: export-templates${{ matrix.build-mono && '-mono' || '' }}
 
   create-release:
@@ -1587,7 +1587,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.create-release.outputs.tag }}
-          files: ./Godot_v${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}_export_templates.tpz
+          files: ./Godot_v${{ format('{0}-{1}', env.GODOT_BASE_VERSION, env.GODOT_VERSION_STATUS) }}_${{ matrix.artifact_name }}.tpz
 
   upload-release-artifacts: 
     if: success() && (
