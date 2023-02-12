@@ -27,7 +27,7 @@ runs:
         curl -fLO https://github.com/godotengine/godot/archive/${{ inputs.version }}.tar.gz
         tar -xvzf ${{ inputs.version }}.tar.gz --strip-components 1 --exclude=".github"
     
-		# Custom steps to download and moving sg-physics to the modules folder. 
+    # Custom steps to download and moving sg-physics to the modules folder. 
     - name: Download sg-physics
       shell: bash
       run: |
