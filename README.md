@@ -26,14 +26,14 @@ runs:
       run: |
         curl -fLO https://github.com/godotengine/godot/archive/${{ inputs.version }}.tar.gz
         tar -xvzf ${{ inputs.version }}.tar.gz --strip-components 1 --exclude=".github"
-		
+    
 		# Custom steps to download and moving sg-physics to the modules folder. 
     - name: Download sg-physics
       shell: bash
       run: |
         git clone https://gitlab.com/Atlinx/sg-physics-2d
         cd sg-physics-2d
-		
+    
     - name: Move sg-physics-2d to modules folder
       shell: bash
       run: mv sg-physics-2d/godot/modules/sg_physics_2d modules
