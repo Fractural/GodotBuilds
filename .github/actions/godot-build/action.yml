@@ -5,11 +5,8 @@ inputs:
     description: Build root to add to the PATH before building godot
     default: ""
   target:
-    description: The scons target (debug/release_debug/release).
+    description: The scons target (editor/template_debug/template_release).
     default: "debug"
-  tools:
-    description: If tools are to be built.
-    default: false
   tests:
     description: If tests are to be built.
     default: false
@@ -40,5 +37,5 @@ runs:
         if [[ ${{ inputs.buildroot != '' }} ]]; then
           echo "Using buildroot at ${{ inputs.buildroot }}"
         fi
-        ${{ inputs.buildroot != '' && format('PATH={0}:$PATH', inputs.buildroot) || '' }} scons p=${{ inputs.platform }} target=${{ inputs.target }} tools=${{ inputs.tools }} tests=${{ inputs.tests }} ${{ env.SCONSFLAGS }}
+        ${{ inputs.buildroot != '' && format('PATH={0}:$PATH', inputs.buildroot) || '' }} scons p=${{ inputs.platform }} target=${{ inputs.target }} tests=${{ inputs.tests }} ${{ env.SCONSFLAGS }}
         ls -l bin/
