@@ -1,6 +1,6 @@
-# Godot Builds 🏗️
+# Godot Builds 3.x 🏗️
 
-Repository that periodically builds Godot. Supports mono, all platforms, and export templates.
+Repository that periodically builds Godot 3.x. Supports mono, all platforms, and export templates.
 
 This serves as a template for others to fork and easily automate building their own custom versions of Godot.
 
