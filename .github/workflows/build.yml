@@ -81,14 +81,14 @@ jobs:
         uses: ./.github/actions/godot-build
         with:
           sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no
-          platform: osx
+          platform: macos
           target: editor
 
       # Generate mono glue
       - name: Generate Mono glue code
         if: ${{ matrix.build-mono }}
         run: |
-          DRI_PRIME=0 "./bin/godot.osx.tools.64.mono" --generate-mono-glue modules/mono/glue
+          DRI_PRIME=0 "./bin/godot.macos.editor.x86_64.mono" --generate-mono-glue modules/mono/glue
 
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
@@ -135,12 +135,12 @@ jobs:
           echo $(basename bin/*)
 
           mkdir -p $HOME/out/templates
-          cp bin/libgodot.iphone.opt.arm64.a $HOME/out/templates/libgodot.iphone.a
-          cp bin/libgodot.iphone.opt.debug.arm64.a $HOME/out/templates/libgodot.iphone.debug.a
-          #$IOS_LIPO -create bin/libgodot.iphone.opt.arm64.simulator.a bin/libgodot.iphone.opt.x86_64.simulator.a -output $HOME/out/templates/libgodot.iphone.simulator.a
-          #$IOS_LIPO -create bin/libgodot.iphone.opt.debug.arm64.simulator.a bin/libgodot.iphone.opt.debug.x86_64.simulator.a -output $HOME/out/templates/libgodot.iphone.debug.simulator.a
-          cp bin/libgodot.iphone.opt.x86_64.simulator.a $HOME/out/templates/libgodot.iphone.simulator.a
-          cp bin/libgodot.iphone.opt.debug.x86_64.simulator.a $HOME/out/templates/libgodot.iphone.debug.simulator.a
+          cp bin/libgodot.iphone.template_release.arm64.a $HOME/out/templates/libgodot.iphone.a
+          cp bin/libgodot.iphone.template_debug.arm64.a $HOME/out/templates/libgodot.iphone.debug.a
+          #$IOS_LIPO -create bin/libgodot.iphone.template_release.arm64.simulator.a bin/libgodot.iphone.template_release.x86_64.simulator.a -output $HOME/out/templates/libgodot.iphone.simulator.a
+          #$IOS_LIPO -create bin/libgodot.iphone.template_debug.arm64.simulator.a bin/libgodot.iphone.template_debug.x86_64.simulator.a -output $HOME/out/templates/libgodot.iphone.debug.simulator.a
+          cp bin/libgodot.iphone.template_release.x86_64.simulator.a $HOME/out/templates/libgodot.iphone.simulator.a
+          cp bin/libgodot.iphone.template_debug.x86_64.simulator.a $HOME/out/templates/libgodot.iphone.debug.simulator.a
 
           if ${{ matrix.build-mono }}; then
             cp -r misc/dist/iphone-mono-libs $HOME/out/templates/iphone-mono-libs
@@ -266,7 +266,7 @@ jobs:
       - name: Generate Mono glue code
         if: ${{ matrix.build-mono }}
         run: |
-          DRI_PRIME=0 xvfb-run "./bin/godot.x11.tools.64.mono" --generate-mono-glue modules/mono/glue || true
+          DRI_PRIME=0 xvfb-run "./bin/godot.linuxbsd.editor.x86_64.mono" --generate-mono-glue modules/mono/glue || true
 
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
@@ -444,7 +444,7 @@ jobs:
       - name: Generate Mono glue code
         if: ${{ matrix.build-mono }}
         run: |
-          DRI_PRIME=0 xvfb-run "./bin/godot.x11.tools.64.mono" --generate-mono-glue modules/mono/glue || true
+          DRI_PRIME=0 xvfb-run "./bin/godot.linuxbsd.editor.x86_64.mono" --generate-mono-glue modules/mono/glue || true
 
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
@@ -570,7 +570,7 @@ jobs:
       - name: Generate Mono glue code
         if: ${{ matrix.build-mono }}
         run: |
-          DRI_PRIME=0 xvfb-run "./bin/godot.x11.tools.64.mono" --generate-mono-glue modules/mono/glue || true
+          DRI_PRIME=0 xvfb-run "./bin/godot.linuxbsd.editor.x86_64.mono" --generate-mono-glue modules/mono/glue || true
 
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
@@ -627,7 +627,7 @@ jobs:
       # region Templates
 
       # region    (bits=64)
-      - name: Compilation (tools=false, bits=64, target=template_debug)
+      - name: Compilation (bits=64, target=template_debug)
         uses: ./.github/actions/godot-build
         with:
           buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
@@ -635,7 +635,7 @@ jobs:
           platform: linuxbsd
           target: template_debug
       
-      - name: Compilation (tools=false, bits=64, target=release)
+      - name: Compilation (bits=64, target=release)
         uses: ./.github/actions/godot-build
         with:
           buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
@@ -683,7 +683,7 @@ jobs:
       # endregion
   
   macos:
-    # Based on https://github.com/godotengine/godot-build-scripts/blob/3.x/build-macosx/build.sh
+    # Based on https://github.com/godotengine/godot-build-scripts/blob/3.x/build-macmacos/build.sh
     runs-on: "macos-latest"
     name: 🍎 macOS ${{ matrix.name }}
     env:
@@ -725,28 +725,28 @@ jobs:
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
-          mono-release: "osx-x86_64"
+          mono-release: "osx-x86_64"  # TODO LATER: might have to rename to macos later if mono-builds repo changes
           mono-bcl: "bcl-desktop"
       
       - name: Setup mono (arm64)
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
-          mono-release: "osx-arm64"
+          mono-release: "macos-arm64"
       
       - name: Mono precompilation
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-build
         with:
           sconsflags: ${{ env.SCONSFLAGS }} ${{ matrix.sconsflags }} module_mono_enabled=yes mono_glue=no
-          platform: osx
+          platform: macos
           target: editor
 
       # Generate mono glue
       - name: Generate Mono glue code
         if: ${{ matrix.build-mono }}
         run: |
-          DRI_PRIME=0 "./bin/godot.osx.tools.64.mono" --generate-mono-glue modules/mono/glue
+          DRI_PRIME=0 "./bin/godot.macos.editor.x86_64.mono" --generate-mono-glue modules/mono/glue
 
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
@@ -763,7 +763,7 @@ jobs:
         uses: ./.github/actions/godot-build
         with:
           sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-osx-x86_64-release' || '' }}
-          platform: osx
+          platform: macos
           target: editor
 
       - name: Dylib Wrangling
@@ -780,8 +780,8 @@ jobs:
       - name: Compilation (arch=arm64)
         uses: ./.github/actions/godot-build
         with:
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=arm64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-osx-arm64-release' || '' }}
-          platform: osx
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=arm64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-macos-arm64-release' || '' }}
+          platform: macos
           target: editor
 
       - name: Dylib Wrangling
@@ -793,10 +793,10 @@ jobs:
 
       - name: Package Editor (arch=arm64, x86_64)
         run: |
-          lipo -create bin/godot.osx.opt.tools.x86_64${{ matrix.build-mono && '.mono' || '' }} \
-            bin/godot.osx.opt.tools.arm64${{ matrix.build-mono && '.mono' || '' }} \
-            -output bin/godot.osx.opt.tools.universal${{ matrix.build-mono && '.mono' || '' }}
-          $STRIP bin/godot.osx.opt.tools.universal${{ matrix.build-mono && '.mono' || '' }}
+          lipo -create bin/godot.macos.editor.x86_64${{ matrix.build-mono && '.mono' || '' }} \
+            bin/godot.macos.editor.arm64${{ matrix.build-mono && '.mono' || '' }} \
+            -output bin/godot.macos.editor.universal${{ matrix.build-mono && '.mono' || '' }}
+          $STRIP bin/godot.macos.editor.universal${{ matrix.build-mono && '.mono' || '' }}
 
           if ${{ matrix.build-mono }}; then
             # Make universal versions of the dylibs we use.
@@ -819,44 +819,44 @@ jobs:
       # endregion
 
       # region Templates
-      - name: Compilation (tools=false, arch=x86_64, target=template_debug)
+      - name: Compilation (arch=x86_64, target=template_debug)
         uses: ./.github/actions/godot-build
         with:
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-osx-x86_64-release' || '' }}
-          platform: osx
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-macos-x86_64-release' || '' }}
+          platform: macos
           target: template_debug
 
-      - name: Compilation (tools=false, arch=arm64, target=template_debug)
+      - name: Compilation (arch=arm64, target=template_debug)
         uses: ./.github/actions/godot-build
         with:
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=arm64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-osx-arm64-release' || '' }}
-          platform: osx
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=arm64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-macos-arm64-release' || '' }}
+          platform: macos
           target: template_debug
 
-      - name: Compilation (tools=false, arch=x86_64, target=release)
+      - name: Compilation (arch=x86_64, target=release)
         uses: ./.github/actions/godot-build
         with:
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-osx-x86_64-release' || '' }} debug_symbols=no
-          platform: osx
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-macos-x86_64-release' || '' }} debug_symbols=no
+          platform: macos
           target: template_release
 
-      - name: Compilation (tools=false, arch=arm64, target=release)
+      - name: Compilation (arch=arm64, target=release)
         uses: ./.github/actions/godot-build
         with:
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=arm64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-osx-arm64-release' || '' }} debug_symbols=no
-          platform: osx
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=arm64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-macos-arm64-release' || '' }} debug_symbols=no
+          platform: macos
           target: template_release
 
       - name: Package Templates (arch=arm64, x86_64)
         run: |
-          lipo -create bin/godot.osx.opt.debug.x86_64${{ matrix.build-mono && '.mono' || '' }} bin/godot.osx.opt.debug.arm64${{ matrix.build-mono && '.mono' || '' }} -output bin/godot.osx.opt.debug.universal${{ matrix.build-mono && '.mono' || '' }}
-          $STRIP bin/godot.osx.opt.debug.universal${{ matrix.build-mono && '.mono' || '' }}
-          lipo -create bin/godot.osx.opt.x86_64${{ matrix.build-mono && '.mono' || '' }} bin/godot.osx.opt.arm64${{ matrix.build-mono && '.mono' || '' }} -output bin/godot.osx.opt.universal${{ matrix.build-mono && '.mono' || '' }}
-          $STRIP bin/godot.osx.opt.universal${{ matrix.build-mono && '.mono' || '' }}
+          lipo -create bin/godot.macos.template_debug.x86_64${{ matrix.build-mono && '.mono' || '' }} bin/godot.macos.template_debug.arm64${{ matrix.build-mono && '.mono' || '' }} -output bin/godot.macos.template_debug.universal${{ matrix.build-mono && '.mono' || '' }}
+          $STRIP bin/godot.macos.template_debug.universal${{ matrix.build-mono && '.mono' || '' }}
+          lipo -create bin/godot.macos.template_release.x86_64${{ matrix.build-mono && '.mono' || '' }} bin/godot.macos.template_release.arm64${{ matrix.build-mono && '.mono' || '' }} -output bin/godot.macos.template_release.universal${{ matrix.build-mono && '.mono' || '' }}
+          $STRIP bin/godot.macos.template_release.universal${{ matrix.build-mono && '.mono' || '' }}
 
           if ${{ matrix.build-mono }}; then
-            cp -f tmp-lib/*.dylib bin/data.mono.osx.64.release/Mono/lib/
-            cp -f tmp-lib/*.dylib bin/data.mono.osx.64.template_debug/Mono/lib/
+            cp -f tmp-lib/*.dylib bin/data.mono.macos.x86_64.release/Mono/lib/
+            cp -f tmp-lib/*.dylib bin/data.mono.macos.x86_64.template_debug/Mono/lib/
           fi
       
       - name: Upload Templates
@@ -955,7 +955,7 @@ jobs:
   #     - name: Generate Mono glue code
   #       if: ${{ matrix.build-mono }}
   #       run: |
-  #         DRI_PRIME=0 xvfb-run "./bin/godot.x11.tools.64.mono" --generate-mono-glue modules/mono/glue || true
+  #         DRI_PRIME=0 xvfb-run "./bin/godot.linuxbsd.editor.x86_64.mono" --generate-mono-glue modules/mono/glue || true
 
   #     - name: Set Mono scons flags
   #       if: ${{ matrix.build-mono }}
@@ -1012,7 +1012,7 @@ jobs:
   #     # region Templates
 
   #     # region    (bits=64)
-  #     - name: Compilation (tools=false, bits=64, target=template_debug)
+  #     - name: Compilation (bits=64, target=template_debug)
   #       uses: ./.github/actions/godot-build
   #       with:
   #         buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
@@ -1020,7 +1020,7 @@ jobs:
   #         platform: server
   #         target: template_debug
       
-  #     - name: Compilation (tools=false, bits=64, target=release)
+  #     - name: Compilation (bits=64, target=release)
   #       uses: ./.github/actions/godot-build
   #       with:
   #         buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
@@ -1039,7 +1039,7 @@ jobs:
   #     # endregion
 
   #     # region    (bits=32)
-  #     - name: Compilation (tools=false, bits=32, target=template_debug)
+  #     - name: Compilation (bits=32, target=template_debug)
   #       uses: ./.github/actions/godot-build
   #       with:
   #         buildroot: "${{ github.workspace }}/i686-godot-linux-gnu_sdk-buildroot/bin"
@@ -1047,7 +1047,7 @@ jobs:
   #         platform: server
   #         target: template_debug
 
-  #     - name: Compilation (tools=false, bits=32, target=release)
+  #     - name: Compilation (bits=32, target=release)
   #       uses: ./.github/actions/godot-build
   #       with:
   #         buildroot: "${{ github.workspace }}/i686-godot-linux-gnu_sdk-buildroot/bin"
@@ -1157,7 +1157,7 @@ jobs:
       - name: Generate Mono glue code
         if: ${{ matrix.build-mono }}
         run: |
-          DRI_PRIME=0 xvfb-run "./bin/godot.x11.tools.64.mono" --generate-mono-glue modules/mono/glue || true
+          DRI_PRIME=0 xvfb-run "./bin/godot.linuxbsd.editor.x86_64.mono" --generate-mono-glue modules/mono/glue || true
       
       - name: Set Mono scons flags
         if: ${{ matrix.build-mono }}
@@ -1212,14 +1212,14 @@ jobs:
       # region Templates
 
       # region    (bits=64)
-      - name: Compilation (tools=false, bits=64, target=template_debug)
+      - name: Compilation (bits=64, target=template_debug)
         uses: ./.github/actions/godot-build
         with:
           sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86_64-release' || '' }}
           platform: windows
           target: template_debug
       
-      - name: Compilation (tools=false, bits=64, target=release)
+      - name: Compilation (bits=64, target=release)
         uses: ./.github/actions/godot-build
         with:
           sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86_64-release' || '' }} debug_symbols=no
@@ -1237,14 +1237,14 @@ jobs:
       # endregion
 
       # region    (bits=32)
-      - name: Compilation (tools=false, bits=32, target=template_debug)
+      - name: Compilation (bits=32, target=template_debug)
         uses: ./.github/actions/godot-build
         with:
           sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86-release' || '' }}
           platform: windows
           target: template_debug
       
-      - name: Compilation (tools=false, bits=32, target=release)
+      - name: Compilation (bits=32, target=release)
         uses: ./.github/actions/godot-build
         with:
           sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86-release' || '' }} debug_symbols=no
@@ -1373,44 +1373,44 @@ jobs:
       - name: Bundle Linux
         run: |
           if ${{ matrix.build-mono }}; then
-            cp -rp linux-mono-templates-64/data.mono.x11.64.* ${{ env.TEMPLATES_DIR }}/
-            cp -rp linux-mono-templates-32/data.mono.x11.32.* ${{ env.TEMPLATES_DIR }}/
+            cp -rp linux-mono-templates-64/data.mono.x11.x86_64.* ${{ env.TEMPLATES_DIR }}/
+            cp -rp linux-mono-templates-32/data.mono.x11.x86_32.* ${{ env.TEMPLATES_DIR }}/
             mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
             cp -r linux-mono-editor-64/GodotSharp/Mono/lib/mono/4.5/ ${{ env.TEMPLATES_DIR }}/bcl/net_4_x
           fi
-          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.x11.opt.64${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_64_release
-          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.x11.opt.debug.64${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_64_debug
-          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.x11.opt.32${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_32_release
-          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.x11.opt.debug.32${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_32_debug
+          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.x11.template_release.x86_64${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_64_release
+          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.x11.template_debug.x86_64${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_64_debug
+          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.x11.template_release.x86_32${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_32_release
+          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.x11.template_debug.x86_32${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_32_debug
           strip ${{ env.TEMPLATES_DIR }}/linux_x11_*
 
       - name: Bundle Windows
         run: |
           if ${{ matrix.build-mono }}; then
-            cp -rp windows-mono-templates-64/data.mono.windows.64.* ${{ env.TEMPLATES_DIR }}/
-            cp -rp windows-mono-templates-32/data.mono.windows.32.* ${{ env.TEMPLATES_DIR }}/
+            cp -rp windows-mono-templates-64/data.mono.windows.x86_64.* ${{ env.TEMPLATES_DIR }}/
+            cp -rp windows-mono-templates-32/data.mono.windows.x86_32.* ${{ env.TEMPLATES_DIR }}/
             mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
             cp -r windows-mono-editor-64/GodotSharp/Mono/lib/mono/4.5/ ${{ env.TEMPLATES_DIR }}/bcl/net_4_x_win
           fi
-          cp windows-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.windows.opt.64${{ matrix.build-mono && '.mono' || '' }}.exe ${{ env.TEMPLATES_DIR }}/windows_64_release.exe
-          cp windows-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.windows.opt.debug.64${{ matrix.build-mono && '.mono' || '' }}.exe ${{ env.TEMPLATES_DIR }}/windows_64_debug.exe
-          cp windows-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.windows.opt.32${{ matrix.build-mono && '.mono' || '' }}.exe ${{ env.TEMPLATES_DIR }}/windows_32_release.exe
-          cp windows-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.windows.opt.debug.32${{ matrix.build-mono && '.mono' || '' }}.exe ${{ env.TEMPLATES_DIR }}/windows_32_debug.exe
+          cp windows-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.windows.template_release.x86_64${{ matrix.build-mono && '.mono' || '' }}.exe ${{ env.TEMPLATES_DIR }}/windows_64_release.exe
+          cp windows-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.windows.template_debug.x86_64${{ matrix.build-mono && '.mono' || '' }}.exe ${{ env.TEMPLATES_DIR }}/windows_64_debug.exe
+          cp windows-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.windows.template_release.x86_32${{ matrix.build-mono && '.mono' || '' }}.exe ${{ env.TEMPLATES_DIR }}/windows_32_release.exe
+          cp windows-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.windows.template_debug.x86_32${{ matrix.build-mono && '.mono' || '' }}.exe ${{ env.TEMPLATES_DIR }}/windows_32_debug.exe
           strip ${{ env.TEMPLATES_DIR }}/windows*.exe
 
       - name: Bundle MacOS
         run: |
-          rm -rf osx_template.app
-          cp -r misc/dist/osx_template.app .
-          mkdir -p osx_template.app/Contents/MacOS
-          cp macos-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.osx.opt.universal${{ matrix.build-mono && '.mono' || '' }} osx_template.app/Contents/MacOS/godot_osx_release.64
-          cp macos-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.osx.opt.debug.universal${{ matrix.build-mono && '.mono' || '' }} osx_template.app/Contents/MacOS/godot_osx_debug.64
+          rm -rf macos_template.app
+          cp -r misc/dist/macos_template.app .
+          mkdir -p macos_template.app/Contents/MacOS
+          cp macos-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.macos.template_release.universal${{ matrix.build-mono && '.mono' || '' }} macos_template.app/Contents/MacOS/godot_macos_release.x86_64
+          cp macos-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.macos.template_debug.universal${{ matrix.build-mono && '.mono' || '' }} macos_template.app/Contents/MacOS/godot_macos_debug.x86_64
           if ${{ matrix.build-mono }}; then
-            cp -rp macos-mono-templates/data.mono.osx.64.* osx_template.app/Contents/Resources/
+            cp -rp macos-mono-templates/data.mono.macos.x86_64.* macos_template.app/Contents/Resources/
           fi
-          chmod +x osx_template.app/Contents/MacOS/godot_osx*
-          zip -q -9 -r "${{ env.TEMPLATES_DIR }}/osx.zip" osx_template.app
-          rm -rf osx_template.app
+          chmod +x macos_template.app/Contents/MacOS/godot_macos*
+          zip -q -9 -r "${{ env.TEMPLATES_DIR }}/macos.zip" macos_template.app
+          rm -rf macos_template.app
           # TODO: Create MacOS signing
           # sign_macos_template ${{ env.TEMPLATES_DIR }} 0
 
@@ -1420,13 +1420,13 @@ jobs:
               mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
               cp -r web-mono-templates/bcl/wasm ${{ env.TEMPLATES_DIR }}/bcl/
           fi
-          cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.opt${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_release.zip
-          cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.opt.debug${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_debug.zip
+          cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.template_release${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_release.zip
+          cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.template_debug${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_debug.zip
           # TODO: Create threads and gdnative
-          # cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.opt.threads${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_threads_release.zip
-          # cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.opt.debug.threads${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_threads_debug.zip
-          # cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.opt.gdnative${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_gdnative_release.zip
-          # cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.opt.debug.gdnative${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_gdnative_debug.zip
+          # cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.template_release.threads${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_threads_release.zip
+          # cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.template_debug.threads${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_threads_debug.zip
+          # cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.template_release.gdnative${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_gdnative_release.zip
+          # cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.template_debug.gdnative${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_gdnative_debug.zip
 
       - name: Bundle Android
         run: |
