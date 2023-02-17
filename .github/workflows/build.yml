@@ -13,13 +13,13 @@ on:
   push:
     branches:
       - main
+      - 4.x
 
 # Global Settings
 # SCONS_CACHE for windows must be set in the build environment
 env:
   # Used for cache key as well as for downloading the correct Godot version.
-  GODOT_BASE_VERSION: 3.5
-  GODOT_BASE_VERSION_STATUS: stable
+  GODOT_BASE_VERSION: master
   GODOT_VERSION_STATUS: custom
   GODOT_MONO_BUILD_TAG: release-5299efd # mono-6.12.0.182
   GODOT_MONO_BUILD_REPO: godotengine/godot-mono-builds
@@ -50,7 +50,7 @@ jobs:
       - name: Download Godot
         uses: ./.github/actions/godot-download
         with:
-          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
+          version: ${{ env.GODOT_BASE_VERSION }}
 
       - name: Setup Godot build cache
         uses: ./.github/actions/godot-cache
@@ -204,7 +204,7 @@ jobs:
       - name: Download Godot
         uses: ./.github/actions/godot-download
         with:
-          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
+          version: ${{ env.GODOT_BASE_VERSION }}
 
       - name: Linux dependencies
         shell: bash
@@ -403,7 +403,7 @@ jobs:
       - name: Download Godot
         uses: ./.github/actions/godot-download
         with:
-          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
+          version: ${{ env.GODOT_BASE_VERSION }}
 
       - name: Linux dependencies
         shell: bash
@@ -528,7 +528,7 @@ jobs:
       - name: Download Godot
         uses: ./.github/actions/godot-download
         with:
-          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
+          version: ${{ env.GODOT_BASE_VERSION }}
 
       - name: Linux dependencies
         shell: bash
@@ -728,7 +728,7 @@ jobs:
       - name: Download Godot
         uses: ./.github/actions/godot-download
         with:
-          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
+          version: ${{ env.GODOT_BASE_VERSION }}
 
       - name: Setup Godot build cache
         uses: ./.github/actions/godot-cache
@@ -919,7 +919,7 @@ jobs:
       - name: Download Godot
         uses: ./.github/actions/godot-download
         with:
-          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
+          version: ${{ env.GODOT_BASE_VERSION }}
 
       - name: Linux dependencies
         shell: bash
@@ -1123,7 +1123,7 @@ jobs:
       - name: Download Godot
         uses: ./.github/actions/godot-download
         with:
-          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
+          version: ${{ env.GODOT_BASE_VERSION }}
 
       - name: Linux dependencies
         shell: bash
@@ -1321,7 +1321,7 @@ jobs:
       - name: Download Godot
         uses: ./.github/actions/godot-download
         with:
-          version: ${{ env.GODOT_BASE_VERSION }}-${{ env.GODOT_BASE_VERSION_STATUS }}
+          version: ${{ env.GODOT_BASE_VERSION }}
 
       # region    Download Templates      
       - name: Download Linux Templates (bits=64)
