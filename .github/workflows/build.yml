@@ -142,31 +142,31 @@ jobs:
           echo $(basename bin/*)
 
           mkdir -p $HOME/out/templates
-          cp bin/libgodot.iphone.template_release.arm64.a $HOME/out/templates/libgodot.iphone.a
-          cp bin/libgodot.iphone.template_debug.arm64.a $HOME/out/templates/libgodot.iphone.debug.a
-          #$IOS_LIPO -create bin/libgodot.iphone.template_release.arm64.simulator.a bin/libgodot.iphone.template_release.x86_64.simulator.a -output $HOME/out/templates/libgodot.iphone.simulator.a
-          #$IOS_LIPO -create bin/libgodot.iphone.template_debug.arm64.simulator.a bin/libgodot.iphone.template_debug.x86_64.simulator.a -output $HOME/out/templates/libgodot.iphone.debug.simulator.a
-          cp bin/libgodot.iphone.template_release.x86_64.simulator.a $HOME/out/templates/libgodot.iphone.simulator.a
-          cp bin/libgodot.iphone.template_debug.x86_64.simulator.a $HOME/out/templates/libgodot.iphone.debug.simulator.a
+          cp bin/libgodot.ios.template_release.arm64.a $HOME/out/templates/libgodot.ios.a
+          cp bin/libgodot.ios.template_debug.arm64.a $HOME/out/templates/libgodot.ios.debug.a
+          #$IOS_LIPO -create bin/libgodot.ios.template_release.arm64.simulator.a bin/libgodot.ios.template_release.x86_64.simulator.a -output $HOME/out/templates/libgodot.ios.simulator.a
+          #$IOS_LIPO -create bin/libgodot.ios.template_debug.arm64.simulator.a bin/libgodot.ios.template_debug.x86_64.simulator.a -output $HOME/out/templates/libgodot.ios.debug.simulator.a
+          cp bin/libgodot.ios.template_release.x86_64.simulator.a $HOME/out/templates/libgodot.ios.simulator.a
+          cp bin/libgodot.ios.template_debug.x86_64.simulator.a $HOME/out/templates/libgodot.ios.debug.simulator.a
 
           if ${{ matrix.build-mono }}; then
             cp -r misc/dist/iphone-mono-libs $HOME/out/templates/iphone-mono-libs
 
-            cp bin/libmonosgen-2.0.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmonosgen-2.0.xcframework/ios-arm64/libmonosgen.a
-            cp bin/libmono-native.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-native.xcframework/ios-arm64/libmono-native.a
-            cp bin/libmono-profiler-log.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-profiler-log.xcframework/ios-arm64/libmono-profiler-log.a
+            cp bin/libmonosgen-2.0.ios.arm64.a $HOME/out/templates/iphone-mono-libs/libmonosgen-2.0.xcframework/ios-arm64/libmonosgen.a
+            cp bin/libmono-native.ios.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-native.xcframework/ios-arm64/libmono-native.a
+            cp bin/libmono-profiler-log.ios.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-profiler-log.xcframework/ios-arm64/libmono-profiler-log.a
 
-            #$IOS_LIPO -create bin/libmonosgen-2.0.iphone.arm64.simulator.a bin/libmonosgen-2.0.iphone.x86_64.simulator.a -output $HOME/out/templates/iphone-mono-libs/libmonosgen-2.0.xcframework/ios-arm64_x86_64-simulator/libmonosgen.a
-            #$IOS_LIPO -create bin/libmono-native.iphone.arm64.simulator.a bin/libmono-native.iphone.x86_64.simulator.a -output $HOME/out/templates/iphone-mono-libs/libmono-native.xcframework/ios-arm64_x86_64-simulator/libmono-native.a
-            #$IOS_LIPO -create bin/libmono-profiler-log.iphone.arm64.simulator.a bin/libmono-profiler-log.iphone.x86_64.simulator.a -output $HOME/out/templates/iphone-mono-libs/libmono-profiler-log.xcframework/ios-arm64_x86_64-simulator/libmono-profiler-log.a
-            cp bin/libmonosgen-2.0.iphone.x86_64.simulator.a $HOME/out/templates/iphone-mono-libs/libmonosgen-2.0.xcframework/ios-arm64_x86_64-simulator/libmonosgen.a
-            cp bin/libmono-native.iphone.x86_64.simulator.a $HOME/out/templates/iphone-mono-libs/libmono-native.xcframework/ios-arm64_x86_64-simulator/libmono-native.a
-            cp bin/libmono-profiler-log.iphone.x86_64.simulator.a $HOME/out/templates/iphone-mono-libs/libmono-profiler-log.xcframework/ios-arm64_x86_64-simulator/libmono-profiler-log.a
+            #$IOS_LIPO -create bin/libmonosgen-2.0.ios.arm64.simulator.a bin/libmonosgen-2.0.ios.x86_64.simulator.a -output $HOME/out/templates/iphone-mono-libs/libmonosgen-2.0.xcframework/ios-arm64_x86_64-simulator/libmonosgen.a
+            #$IOS_LIPO -create bin/libmono-native.ios.arm64.simulator.a bin/libmono-native.ios.x86_64.simulator.a -output $HOME/out/templates/iphone-mono-libs/libmono-native.xcframework/ios-arm64_x86_64-simulator/libmono-native.a
+            #$IOS_LIPO -create bin/libmono-profiler-log.ios.arm64.simulator.a bin/libmono-profiler-log.ios.x86_64.simulator.a -output $HOME/out/templates/iphone-mono-libs/libmono-profiler-log.xcframework/ios-arm64_x86_64-simulator/libmono-profiler-log.a
+            cp bin/libmonosgen-2.0.ios.x86_64.simulator.a $HOME/out/templates/iphone-mono-libs/libmonosgen-2.0.xcframework/ios-arm64_x86_64-simulator/libmonosgen.a
+            cp bin/libmono-native.ios.x86_64.simulator.a $HOME/out/templates/iphone-mono-libs/libmono-native.xcframework/ios-arm64_x86_64-simulator/libmono-native.a
+            cp bin/libmono-profiler-log.ios.x86_64.simulator.a $HOME/out/templates/iphone-mono-libs/libmono-profiler-log.xcframework/ios-arm64_x86_64-simulator/libmono-profiler-log.a
 
             # The Mono libraries for the interpreter are not available for simulator builds
-            cp bin/libmono-ee-interp.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-ee-interp.xcframework/ios-arm64/libmono-ee-interp.a
-            cp bin/libmono-icall-table.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-icall-table.xcframework/ios-arm64/libmono-icall-table.a
-            cp bin/libmono-ilgen.iphone.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-ilgen.xcframework/ios-arm64/libmono-ilgen.a
+            cp bin/libmono-ee-interp.ios.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-ee-interp.xcframework/ios-arm64/libmono-ee-interp.a
+            cp bin/libmono-icall-table.ios.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-icall-table.xcframework/ios-arm64/libmono-icall-table.a
+            cp bin/libmono-ilgen.ios.arm64.a $HOME/out/templates/iphone-mono-libs/libmono-ilgen.xcframework/ios-arm64/libmono-ilgen.a
 
             mkdir -p $HOME/out/templates/bcl
             cp -r $HOME/mono-bcls/ios-bcl/* $HOME/out/templates/bcl
@@ -1271,10 +1271,10 @@ jobs:
           fi
           rm -rf ios_xcode
           cp -r misc/dist/ios_xcode ios_xcode
-          cp ios-${{ matrix.build-mono && 'mono-' || '' }}templates/libgodot.iphone.simulator.a ios_xcode/libgodot.iphone.release.xcframework/ios-arm64_x86_64-simulator/libgodot.a
-          cp ios-${{ matrix.build-mono && 'mono-' || '' }}templates/libgodot.iphone.debug.simulator.a ios_xcode/libgodot.iphone.debug.xcframework/ios-arm64_x86_64-simulator/libgodot.a
-          cp ios-${{ matrix.build-mono && 'mono-' || '' }}templates/libgodot.iphone.a ios_xcode/libgodot.iphone.release.xcframework/ios-arm64/libgodot.a
-          cp ios-${{ matrix.build-mono && 'mono-' || '' }}templates/libgodot.iphone.debug.a ios_xcode/libgodot.iphone.debug.xcframework/ios-arm64/libgodot.a
+          cp ios-${{ matrix.build-mono && 'mono-' || '' }}templates/libgodot.ios.simulator.a ios_xcode/libgodot.ios.release.xcframework/ios-arm64_x86_64-simulator/libgodot.a
+          cp ios-${{ matrix.build-mono && 'mono-' || '' }}templates/libgodot.ios.debug.simulator.a ios_xcode/libgodot.ios.debug.xcframework/ios-arm64_x86_64-simulator/libgodot.a
+          cp ios-${{ matrix.build-mono && 'mono-' || '' }}templates/libgodot.ios.a ios_xcode/libgodot.ios.release.xcframework/ios-arm64/libgodot.a
+          cp ios-${{ matrix.build-mono && 'mono-' || '' }}templates/libgodot.ios.debug.a ios_xcode/libgodot.ios.debug.xcframework/ios-arm64/libgodot.a
           cd ios_xcode
           
           zip -q -9 -r "${{ env.TEMPLATES_DIR }}/iphone.zip" *
