@@ -793,22 +793,6 @@ jobs:
           platform: macos
           target: editor
 
-      - name: Debug results
-        run: |
-          brew install tree
-          tree -a bin
-
-      # - name: Dylib Wrangling
-      #   if: ${{ matrix.build-mono }}
-      #   run: |
-      #     # Note: A bit of dylib wrangling involved as x86_64 and arm64 builds both generate GodotSharp
-      #     # so the second build overrides the first, but we need to lipo the libs to make them universal.
-      #     # We also need to ensure that /etc/mono/config has the proper filenames (keep arm64 as the last
-      #     # build so that we rely on its config, which has libmono-native.dylib instead of
-      #     # libmono-native-compat.dylib).
-      #     mkdir -p tmp-lib/{x86_64,arm64}
-      #     cp bin/GodotSharp/Mono/lib/*.dylib tmp-lib/x86_64/
-
       - name: Compilation (arch=arm64)
         uses: ./.github/actions/godot-build
         with:
@@ -816,29 +800,12 @@ jobs:
           platform: macos
           target: editor
 
-      - name: Dylib Wrangling
-        if: ${{ matrix.build-mono }}
-        run: |
-          cp bin/GodotSharp/Mono/lib/*.dylib tmp-lib/arm64/
-          echo "tmp-lib:"
-          find tmp-lib | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"
-
       - name: Package Editor (arch=arm64, x86_64)
         run: |
           lipo -create bin/godot.macos.editor.x86_64${{ matrix.build-mono && '.mono' || '' }} \
             bin/godot.macos.editor.arm64${{ matrix.build-mono && '.mono' || '' }} \
             -output bin/godot.macos.editor.universal${{ matrix.build-mono && '.mono' || '' }}
           $STRIP bin/godot.macos.editor.universal${{ matrix.build-mono && '.mono' || '' }}
-
-          if ${{ matrix.build-mono }}; then
-            # Make universal versions of the dylibs we use.
-            lipo -create tmp-lib/x86_64/libmono-native.dylib tmp-lib/arm64/libmono-native.dylib -output tmp-lib/libmono-native.dylib
-            lipo -create tmp-lib/x86_64/libMonoPosixHelper.dylib tmp-lib/arm64/libMonoPosixHelper.dylib -output tmp-lib/libMonoPosixHelper.dylib
-            # Somehow only included in x86_64 build.
-            cp tmp-lib/x86_64/libmono-btls-shared.dylib tmp-lib/
-
-            cp -f tmp-lib/*.dylib bin/GodotSharp/Mono/lib/
-          fi
       
       - name: Upload Editor
         uses: ./.github/actions/upload-artifact
@@ -885,11 +852,6 @@ jobs:
           $STRIP bin/godot.macos.template_debug.universal${{ matrix.build-mono && '.mono' || '' }}
           lipo -create bin/godot.macos.template_release.x86_64${{ matrix.build-mono && '.mono' || '' }} bin/godot.macos.template_release.arm64${{ matrix.build-mono && '.mono' || '' }} -output bin/godot.macos.template_release.universal${{ matrix.build-mono && '.mono' || '' }}
           $STRIP bin/godot.macos.template_release.universal${{ matrix.build-mono && '.mono' || '' }}
-
-          if ${{ matrix.build-mono }}; then
-            cp -f tmp-lib/*.dylib bin/data.mono.macos.x86_64.release/Mono/lib/
-            cp -f tmp-lib/*.dylib bin/data.mono.macos.x86_64.template_debug/Mono/lib/
-          fi
       
       - name: Upload Templates
         uses: ./.github/actions/upload-artifact
@@ -1162,8 +1124,7 @@ jobs:
         uses: actions/download-artifact@v3
         if: ${{ !matrix.build-mono }} # TEMP: Remove once support is added
         with:
-          name: web-${{ matrix.build-mono && 'mono-' || '' }}templates
-          path: web-${{ matrix.build-mono && 'mono-' || '' }}templates
+          name: web-${{ matrix.build-mono && 'mono-' || '' }}templates 
 
       - name: Download iOS Templates
         uses: actions/download-artifact@v3
