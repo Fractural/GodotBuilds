@@ -31,7 +31,7 @@ jobs:
     runs-on: "macos-latest"
     name: 🍏 iOS ${{ matrix.name }}
     env:
-      SCONSFLAGS:
+      SCONSFLAGS: vulkan_sdk_path=~/VulkanSDK
     strategy:
       fail-fast: false
       matrix:
@@ -70,14 +70,7 @@ jobs:
 
           sudo /Volumes/vulkansdk-macos-${{ env.VULKAN_SDK_VERSION }}/InstallVulkan.app/Contents/MacOS/InstallVulkan --root ~/VulkanSDK --accept-licenses --default-answer --confirm-command install
 
-      - name: Print Vulkan SDK
-        run: |
-          tree -a $VULKAN_SDK
-
-      - name: Print Vulkan SDK
-        run: |
-          brew install tree
-          tree -a $VULKAN_SDK
+          tree -a ~/VulkanSDK
       
       - name: Setup python and scons
         uses: ./.github/actions/godot-deps
@@ -709,7 +702,7 @@ jobs:
     runs-on: "macos-latest"
     name: 🍎 macOS ${{ matrix.name }}
     env:
-      SCONSFLAGS:
+      SCONSFLAGS: vulkan_sdk_path=~/VulkanSDK
       STRIP: "strip -u -r"
     strategy:
       fail-fast: false
@@ -747,6 +740,8 @@ jobs:
           tree -a /Volumes
 
           sudo /Volumes/vulkansdk-macos-${{ env.VULKAN_SDK_VERSION }}/InstallVulkan.app/Contents/MacOS/InstallVulkan --root ~/VulkanSDK --accept-licenses --default-answer --confirm-command install
+
+          tree -a ~/VulkanSDK
 
       - name: Setup python and scons
         uses: ./.github/actions/godot-deps
