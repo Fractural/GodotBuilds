@@ -584,16 +584,16 @@ jobs:
       
       # region Editor
       
-      # region    (bits=64)
-      - name: Compilation (bits=64)
+      # region    (arch=x86_64)
+      - name: Compilation (arch=x86_64)
         uses: ./.github/actions/godot-build
         with:
           buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }}
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }}
           platform: linuxbsd
           target: editor
       
-      - name: Upload Editor (bits=64)
+      - name: Upload Editor (arch=x86_64)
         uses: ./.github/actions/upload-artifact
         with:
           name: ${{ matrix.cache-name }}-editor-64
@@ -603,16 +603,16 @@ jobs:
           rm -rf bin
       # endregion
 
-      # region    (bits=32)
-      - name: Compilation (bits=32)
+      # region    (arch=x86_32)
+      - name: Compilation (arch=x86_32)
         uses: ./.github/actions/godot-build
         with:
           buildroot: "${{ github.workspace }}/i686-godot-linux-gnu_sdk-buildroot/bin"
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }}
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }}
           platform: linuxbsd
           target: editor
       
-      - name: Upload Editor (bits=32)
+      - name: Upload Editor (arch=x86_32)
         uses: ./.github/actions/upload-artifact
         with:
           name: ${{ matrix.cache-name }}-editor-32
@@ -626,24 +626,24 @@ jobs:
 
       # region Templates
 
-      # region    (bits=64)
-      - name: Compilation (bits=64, target=template_debug)
+      # region    (arch=x86_64)
+      - name: Compilation (arch=x86_64, target=template_debug)
         uses: ./.github/actions/godot-build
         with:
           buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }}
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }}
           platform: linuxbsd
           target: template_debug
       
-      - name: Compilation (bits=64, target=release)
+      - name: Compilation (arch=x86_64, target=release)
         uses: ./.github/actions/godot-build
         with:
           buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }} debug_symbols=no
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }} debug_symbols=no
           platform: linuxbsd
           target: template_release
       
-      - name: Upload Templates (bits=64)
+      - name: Upload Templates (arch=x86_64)
         uses: ./.github/actions/upload-artifact
         with:
           name: ${{ matrix.cache-name }}-templates-64
@@ -653,24 +653,24 @@ jobs:
           rm -rf bin
       # endregion
 
-      # region    (bits=32)
-      - name: Compilation (bits=32, target=template_debug)
+      # region    (arch=x86_32)
+      - name: Compilation (arch=x86_32, target=template_debug)
         uses: ./.github/actions/godot-build
         with:
           buildroot: "${{ github.workspace }}/i686-godot-linux-gnu_sdk-buildroot/bin"
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }}
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }}
           platform: linuxbsd
           target: template_debug
       
-      - name: Compilation (bits=32, target=release)
+      - name: Compilation (arch=x86_32, target=release)
         uses: ./.github/actions/godot-build
         with:
           buildroot: "${{ github.workspace }}/i686-godot-linux-gnu_sdk-buildroot/bin"
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }} debug_symbols=no
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }} debug_symbols=no
           platform: linuxbsd
           target: template_release
       
-      - name: Upload Templates (bits=32)
+      - name: Upload Templates (arch=x86_32)
         uses: ./.github/actions/upload-artifact
         with:
           name: ${{ matrix.cache-name }}-templates-32
@@ -969,12 +969,12 @@ jobs:
       
   #     # region Editor
 
-  #     # region    (bits=64)
-  #     - name: Compilation (bits=64)
+  #     # region    (arch=x86_64)
+  #     - name: Compilation (arch=x86_64)
   #       uses: ./.github/actions/godot-build
   #       with:
   #         buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
-  #         sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }}
+  #         sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }}
   #         platform: server
   #         target: editor
       
@@ -988,12 +988,12 @@ jobs:
   #         rm -rf bin
   #     # endregion
 
-  #     # region    (bits=32)
-  #     - name: Compilation (bits=32)
+  #     # region    (arch=x86_32)
+  #     - name: Compilation (arch=x86_32)
   #       uses: ./.github/actions/godot-build
   #       with:
   #         buildroot: "${{ github.workspace }}/i686-godot-linux-gnu_sdk-buildroot/bin"
-  #         sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }}
+  #         sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }}
   #         platform: server
   #         target: editor
       
@@ -1011,20 +1011,20 @@ jobs:
 
   #     # region Templates
 
-  #     # region    (bits=64)
-  #     - name: Compilation (bits=64, target=template_debug)
+  #     # region    (arch=x86_64)
+  #     - name: Compilation (arch=x86_64, target=template_debug)
   #       uses: ./.github/actions/godot-build
   #       with:
   #         buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
-  #         sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }}
+  #         sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }}
   #         platform: server
   #         target: template_debug
       
-  #     - name: Compilation (bits=64, target=release)
+  #     - name: Compilation (arch=x86_64, target=release)
   #       uses: ./.github/actions/godot-build
   #       with:
   #         buildroot: "${{ github.workspace }}/x86_64-godot-linux-gnu_sdk-buildroot/bin"
-  #         sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }} debug_symbols=no
+  #         sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86_64-release' || '' }} debug_symbols=no
   #         platform: server
   #         target: template_release
       
@@ -1038,20 +1038,20 @@ jobs:
   #         rm -rf bin
   #     # endregion
 
-  #     # region    (bits=32)
-  #     - name: Compilation (bits=32, target=template_debug)
+  #     # region    (arch=x86_32)
+  #     - name: Compilation (arch=x86_32, target=template_debug)
   #       uses: ./.github/actions/godot-build
   #       with:
   #         buildroot: "${{ github.workspace }}/i686-godot-linux-gnu_sdk-buildroot/bin"
-  #         sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }}
+  #         sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }}
   #         platform: server
   #         target: template_debug
 
-  #     - name: Compilation (bits=32, target=release)
+  #     - name: Compilation (arch=x86_32, target=release)
   #       uses: ./.github/actions/godot-build
   #       with:
   #         buildroot: "${{ github.workspace }}/i686-godot-linux-gnu_sdk-buildroot/bin"
-  #         sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }} debug_symbols=no
+  #         sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-linux-x86-release' || '' }} debug_symbols=no
   #         platform: server
   #         target: template_release
         
@@ -1171,11 +1171,11 @@ jobs:
 
       # region Editor
 
-      # region    (bits=64)
-      - name: Compilation (bits=64)
+      # region    (arch=x86_64)
+      - name: Compilation (arch=x86_64)
         uses: ./.github/actions/godot-build
         with:
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86_64-release' || '' }}
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86_64-release' || '' }}
           platform: windows
           target: editor
       
@@ -1189,11 +1189,11 @@ jobs:
           rm -rf bin
       # endregion
 
-      # region    (bits=32)
-      - name: Compilation (bits=32)
+      # region    (arch=x86_32)
+      - name: Compilation (arch=x86_32)
         uses: ./.github/actions/godot-build
         with:
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86-release' || '' }}
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86-release' || '' }}
           platform: windows
           target: editor
       
@@ -1211,18 +1211,18 @@ jobs:
 
       # region Templates
 
-      # region    (bits=64)
-      - name: Compilation (bits=64, target=template_debug)
+      # region    (arch=x86_64)
+      - name: Compilation (arch=x86_64, target=template_debug)
         uses: ./.github/actions/godot-build
         with:
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86_64-release' || '' }}
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86_64-release' || '' }}
           platform: windows
           target: template_debug
       
-      - name: Compilation (bits=64, target=release)
+      - name: Compilation (arch=x86_64, target=release)
         uses: ./.github/actions/godot-build
         with:
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86_64-release' || '' }} debug_symbols=no
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_64 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86_64-release' || '' }} debug_symbols=no
           platform: windows
           target: template_release
 
@@ -1236,18 +1236,18 @@ jobs:
           rm -rf bin
       # endregion
 
-      # region    (bits=32)
-      - name: Compilation (bits=32, target=template_debug)
+      # region    (arch=x86_32)
+      - name: Compilation (arch=x86_32, target=template_debug)
         uses: ./.github/actions/godot-build
         with:
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86-release' || '' }}
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86-release' || '' }}
           platform: windows
           target: template_debug
       
-      - name: Compilation (bits=32, target=release)
+      - name: Compilation (arch=x86_32, target=release)
         uses: ./.github/actions/godot-build
         with:
-          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} bits=32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86-release' || '' }} debug_symbols=no
+          sconsflags: ${{ env.SCONSFLAGS }} ${{ env.MONO_SCONSFLAGS }} ${{ matrix.sconsflags }} arch=x86_32 ${{ matrix.build-mono && 'mono_prefix=$HOME/mono-installs/desktop-windows-x86-release' || '' }} debug_symbols=no
           platform: windows
           target: template_release
       
@@ -1286,25 +1286,25 @@ jobs:
           version: ${{ env.GODOT_BASE_VERSION }}
 
       # region    Download Templates      
-      - name: Download Linux Templates (bits=64)
+      - name: Download Linux Templates (arch=x86_64)
         uses: actions/download-artifact@v3
         with:
           name: linux-${{ matrix.build-mono && 'mono-' || '' }}templates-64
           path: linux-${{ matrix.build-mono && 'mono-' || '' }}templates-64
       
-      - name: Download Linux Templates (bits=32)
+      - name: Download Linux Templates (arch=x86_32)
         uses: actions/download-artifact@v3
         with:
           name: linux-${{ matrix.build-mono && 'mono-' || '' }}templates-32
           path: linux-${{ matrix.build-mono && 'mono-' || '' }}templates-32
       
-      - name: Download Windows Templates (bits=64)
+      - name: Download Windows Templates (arch=x86_64)
         uses: actions/download-artifact@v3
         with:
           name: windows-${{ matrix.build-mono && 'mono-' || '' }}templates-64
           path: windows-${{ matrix.build-mono && 'mono-' || '' }}templates-64
       
-      - name: Download Windows Templates (bits=32)
+      - name: Download Windows Templates (arch=x86_32)
         uses: actions/download-artifact@v3
         with:
           name: windows-${{ matrix.build-mono && 'mono-' || '' }}templates-32
@@ -1337,14 +1337,14 @@ jobs:
       
       # region    Download Mono Editors
       # These are used for fetching the BCL libraries
-      - name: Download Linux Mono Editor (bits=64)
+      - name: Download Linux Mono Editor (arch=x86_64)
         uses: actions/download-artifact@v3
         if: ${{ matrix.build-mono }}
         with:
           name: linux-mono-editor-64
           path: linux-mono-editor-64
       
-      - name: Download Windows Mono Editor (bits=64)
+      - name: Download Windows Mono Editor (arch=x86_64)
         uses: actions/download-artifact@v3
         if: ${{ matrix.build-mono }}
         with:
