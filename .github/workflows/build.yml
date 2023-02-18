@@ -1175,7 +1175,6 @@ jobs:
             cp -rp linux-mono-templates-64/data.mono.x11.x86_64.* ${{ env.TEMPLATES_DIR }}/
             cp -rp linux-mono-templates-32/data.mono.x11.x86_32.* ${{ env.TEMPLATES_DIR }}/
             mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
-            cp -r linux-mono-editor-64/GodotSharp/Mono/lib/mono/4.5/ ${{ env.TEMPLATES_DIR }}/bcl/net_4_x
           fi
           cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.x11.template_release.x86_64${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_64_release
           cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.x11.template_debug.x86_64${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_64_debug
@@ -1189,7 +1188,6 @@ jobs:
             cp -rp windows-mono-templates-64/data.mono.windows.x86_64.* ${{ env.TEMPLATES_DIR }}/
             cp -rp windows-mono-templates-32/data.mono.windows.x86_32.* ${{ env.TEMPLATES_DIR }}/
             mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
-            cp -r windows-mono-editor-64/GodotSharp/Mono/lib/mono/4.5/ ${{ env.TEMPLATES_DIR }}/bcl/net_4_x_win
           fi
           cp windows-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.windows.template_release.x86_64${{ matrix.build-mono && '.mono' || '' }}.exe ${{ env.TEMPLATES_DIR }}/windows_64_release.exe
           cp windows-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.windows.template_debug.x86_64${{ matrix.build-mono && '.mono' || '' }}.exe ${{ env.TEMPLATES_DIR }}/windows_64_debug.exe
