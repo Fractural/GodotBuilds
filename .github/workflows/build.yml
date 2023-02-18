@@ -61,7 +61,7 @@ jobs:
         continue-on-error: true
 
       - name: Install Vulkan SDK
-        run:
+        run: |
           curl -fLO https://sdk.lunarg.com/sdk/download/${{ env.VULKAN_SDK_VERSION }}/mac/vulkansdk-macos-${{ env.VULKAN_SDK_VERSION }}.dmg
           sudo hdiutil attach vulkansdk-macos-${{ env.VULKAN_SDK_VERSION }}.dmg
 
@@ -739,7 +739,7 @@ jobs:
         continue-on-error: true
 
       - name: Install Vulkan SDK
-        run:
+        run: |
           curl -fLO https://sdk.lunarg.com/sdk/download/${{ env.VULKAN_SDK_VERSION }}/mac/vulkansdk-macos-${{ env.VULKAN_SDK_VERSION }}.dmg
           sudo hdiutil attach vulkansdk-macos-${{ env.VULKAN_SDK_VERSION }}.dmg
 
