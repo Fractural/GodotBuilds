@@ -759,7 +759,7 @@ jobs:
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
-          mono-release: "macos-arm64"
+          mono-release: "osx-arm64"
       
       - name: Mono precompilation
         if: ${{ matrix.build-mono }}
