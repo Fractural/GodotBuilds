@@ -1210,17 +1210,20 @@ jobs:
 
       - name: Bundle Linux
         run: |
+          # TODO: Check if bcl folders are needed once 4.0 release comes out
+          #       If they are no longer needed, then delete bcl generation from code
+          
           if ${{ matrix.build-mono }}; then
-            cp -rp linux-mono-templates-64/data.mono.x11.x86_64.* ${{ env.TEMPLATES_DIR }}/
-            cp -rp linux-mono-templates-32/data.mono.x11.x86_32.* ${{ env.TEMPLATES_DIR }}/
+            cp -rp linux-mono-templates-64/data.mono.linuxbsd.x86_64.* ${{ env.TEMPLATES_DIR }}/
+            cp -rp linux-mono-templates-32/data.mono.linuxbsd.x86_32.* ${{ env.TEMPLATES_DIR }}/
             mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
             cp -r linux-mono-editor-64/GodotSharp/Mono/lib/mono/4.5/ ${{ env.TEMPLATES_DIR }}/bcl/net_4_x
           fi
-          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.x11.template_release.x86_64${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_64_release
-          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.x11.template_debug.x86_64${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_64_debug
-          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.x11.template_release.x86_32${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_32_release
-          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.x11.template_debug.x86_32${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linux_x11_32_debug
-          strip ${{ env.TEMPLATES_DIR }}/linux_x11_*
+          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.linuxbsd.template_release.x86_64${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linuxbsd_64_release
+          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-64/godot.linuxbsd.template_debug.x86_64${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linuxbsd_64_debug
+          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.linuxbsd.template_release.x86_32${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linuxbsd_32_release
+          cp linux-${{ matrix.build-mono && 'mono-' || '' }}templates-32/godot.linuxbsd.template_debug.x86_32${{ matrix.build-mono && '.mono' || '' }} ${{ env.TEMPLATES_DIR }}/linuxbsd_32_debug
+          strip ${{ env.TEMPLATES_DIR }}/linuxbsd_*
 
       - name: Bundle Windows
         run: |
