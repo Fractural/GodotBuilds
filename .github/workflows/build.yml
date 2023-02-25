@@ -1075,11 +1075,6 @@ jobs:
     steps:
       # region Setup
       - uses: actions/checkout@v3
-
-      - name: Download Godot
-        uses: ./.github/actions/godot-download
-        with:
-          version: ${{ env.GODOT_BASE_VERSION }}
       # endregion
 
       # region    Download Templates      
@@ -1153,7 +1148,8 @@ jobs:
 
       - name: Debug Print
         run: |
-          ls -a
+          sudo apt-get install tree
+          tree -a .
       # endregion
 
       - name: Setup ENV Vars
