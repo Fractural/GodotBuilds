@@ -1221,13 +1221,8 @@ jobs:
               mkdir -p ${{ env.TEMPLATES_DIR }}/bcl
               cp -r web-mono-templates/bcl/wasm ${{ env.TEMPLATES_DIR }}/bcl/
           fi
-          cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.template_release${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_release.zip
-          cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.template_debug${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_debug.zip
-          # TODO: Create threads and gdnative
-          # cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.template_release.threads${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_threads_release.zip
-          # cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.template_debug.threads${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_threads_debug.zip
-          # cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.template_release.gdnative${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_gdnative_release.zip
-          # cp web-${{ matrix.build-mono && 'mono-' || '' }}templates/godot.web.template_debug.gdnative${{ matrix.build-mono && '.mono' || '' }}.zip ${{ env.TEMPLATES_DIR }}/webassembly_gdnative_debug.zip
+          cp godot.web.template_debug.wasm32.${{ matrix.build-mono && 'mono.' || '' }}zip ${{ env.TEMPLATES_DIR }}/web_debug.zip
+          cp godot.web.template_release.wasm32.${{ matrix.build-mono && 'mono.' || '' }}zip ${{ env.TEMPLATES_DIR }}/web_release.zip
 
       - name: Bundle Android
         if: ${{ !matrix.build-mono }} # TEMP: Remove once support is added
