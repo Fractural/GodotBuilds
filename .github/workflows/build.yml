@@ -1327,7 +1327,7 @@ jobs:
         run: |
           rm -rf bin
       # endregion
-      
+
       # region Editor
 
       # region    (bits=64)
@@ -1609,7 +1609,8 @@ jobs:
         linux,
         macos,
         server,
-        windows,
+        windows-32,
+        windows-64,
         bundle-export-templates,
       ]
     name: Create Release
