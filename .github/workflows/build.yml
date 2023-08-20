@@ -1097,10 +1097,12 @@ jobs:
         include:
           - name: Editor & Templates
             cache-name: windows-32
+            artifact-name: windows
             build-mono: false
 
           - name: Editor & Templates w/ Mono
             cache-name: windows-32-mono
+            artifact-name: windows-mono
             build-mono: true
 
     steps:
@@ -1194,7 +1196,7 @@ jobs:
       - name: Upload Templates
         uses: ./.github/actions/upload-artifact
         with:
-          name: ${{ matrix.cache-name }}-editor-32
+          name: ${{ matrix.artifact-name }}-editor-32
 
       - name: Clear bin
         run: |
@@ -1224,7 +1226,7 @@ jobs:
       - name: Upload Editor
         uses: ./.github/actions/upload-artifact
         with:
-          name: ${{ matrix.cache-name }}-templates-32
+          name: ${{ matrix.artifact-name }}-templates-32
 
       - name: Clear bin
         run: |
@@ -1244,10 +1246,12 @@ jobs:
         include:
           - name: Editor & Templates
             cache-name: windows-64
+            artifact-name: windows
             build-mono: false
 
           - name: Editor & Templates w/ Mono
             cache-name: windows-64-mono
+            artifact-name: windows-mono
             build-mono: true
 
     steps:
@@ -1341,7 +1345,7 @@ jobs:
       - name: Upload Editor
         uses: ./.github/actions/upload-artifact
         with:
-          name: ${{ matrix.cache-name }}-editor-64
+          name: ${{ matrix.artifact-name }}-editor-64
 
       - name: Clear bin
         run: |
@@ -1371,7 +1375,7 @@ jobs:
       - name: Upload Templates
         uses: ./.github/actions/upload-artifact
         with:
-          name: ${{ matrix.cache-name }}-templates-64
+          name: ${{ matrix.artifact-name }}-templates-64
 
       - name: Clear bin
         run: |
