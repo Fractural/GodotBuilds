@@ -1295,7 +1295,7 @@ jobs:
         if: ${{ matrix.build-mono }}
         uses: ./.github/actions/godot-mono
         with:
-          mono-bcl: "bcl-desktop"
+          mono-bcl: "bcl-desktop-win32"
           mono-release: "windows-x86_64"
 
       - name: Setup mono (linux-x86_64)
