@@ -1096,11 +1096,11 @@ jobs:
       matrix:
         include:
           - name: Editor & Templates
-            cache-name: windows
+            cache-name: windows-32
             build-mono: false
 
           - name: Editor & Templates w/ Mono
-            cache-name: windows-mono
+            cache-name: windows-32-mono
             build-mono: true
 
     steps:
@@ -1243,11 +1243,11 @@ jobs:
       matrix:
         include:
           - name: Editor & Templates
-            cache-name: windows
+            cache-name: windows-64
             build-mono: false
 
           - name: Editor & Templates w/ Mono
-            cache-name: windows-mono
+            cache-name: windows-64-mono
             build-mono: true
 
     steps:
@@ -1327,7 +1327,6 @@ jobs:
         run: |
           rm -rf bin
       # endregion
-
       # region Editor
 
       # region    (bits=64)
