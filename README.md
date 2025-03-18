@@ -1,6 +1,6 @@
 > [!Warning]
 > This repository does not work due to changes in the Godot build system. As it stands
-> I no longer need customer Godot Engine builds and do not have the time to
+> I no longer need custom Godot Engine builds and do not have the time to
 > maintain an automated build system.
 > 
 > If you'd like to take over the maintenance of this repository, feel free to reach out!
